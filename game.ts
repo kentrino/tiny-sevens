@@ -158,10 +158,11 @@ export function run(game: Game, action: Action): RunResult {
     }
   }
   const next = nextPlayer(game)
+  const { hands, field } = newGameAfterCardAction(game, action)
   const newGame = {
     ...game,
-    field: place(game.field, action.card),
-    hands: newHandsAfterCardAction(game.hands, action),
+    field: field,
+    hands: hands,
     turn: game.turn + 1,
     currentPlayer: next,
   }
@@ -181,7 +182,7 @@ function findPlayerWithCard(hands: Hand[], card: Card): number {
  * Place all 7s on the field and remove them from the hands.
  * @param game
  */
-function newGameAfterInitialAction(game: Game): { hands: Hand[], field: Field } {
+function newGameAfterInitialAction(game: Game): Pick<Game, "hands" | "field"> {
   let field = game.field
   for (const suit of suits) {
     field = place(field, { number: '7', suit: suit })
@@ -196,18 +197,21 @@ function newGameAfterInitialAction(game: Game): { hands: Hand[], field: Field } 
   }
 }
 
-function newHandsAfterCardAction(hands: Hand[], action: CardAction): Hand[] {
+function newGameAfterCardAction(game: Game, action: CardAction): Pick<Game, "hands" | "field">{
   function isSame(a: Card, b: Card): boolean {
     return a.number === b.number && a.suit === b.suit
   }
-  return hands.map((hand, player) => {
-    if (player === action.player) {
-      return {
-        cards: hand.cards.filter((card) => !isSame(card, action.card)),
+  return {
+    field: place(game.field, action.card),
+    hands: game.hands.map((hand, player) => {
+      if (player === action.player) {
+        return {
+          cards: hand.cards.filter((card) => !isSame(card, action.card)),
+        }
       }
-    }
-    return hand
-  })
+      return hand
+    })
+  }
 }
 
 export function finishStatus(game: Game): FinishStatus {
