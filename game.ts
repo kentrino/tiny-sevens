@@ -407,26 +407,12 @@ function initialField(): Field {
 
 function canPlace(field: Field, card: Card): Result<''> {
   const rightPlace = numbers.indexOf(card.number)
-  if (rightPlace < 7) {
-    const right = rightPlace + 1
-    const ok = typeof field.fields[card.suit][right] !== 'undefined'
-    if (ok) {
-      return { ok: true, value: '' }
-    }
-    return {
-      ok: false,
-      error: 'right-hand neighbor is empty',
-    }
+  const right = field.fields[card.suit][rightPlace + 1]
+  const left = field.fields[card.suit][rightPlace - 1]
+  if (right === undefined && left === undefined) {
+    return { ok: false, error: 'both neighbors are empty' }
   }
-  const left = rightPlace - 1
-  const ok = typeof field.fields[card.suit][left] !== 'undefined'
-  if (ok) {
-    return { ok: true, value: '' }
-  }
-  return {
-    ok: false,
-    error: 'left-hand neighbor is empty',
-  }
+  return { ok: true, value: '' }
 }
 
 function place(field: Field, card: Card): Field {
