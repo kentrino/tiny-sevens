@@ -124,7 +124,7 @@ export function validate(game: Game, action: Action): Result<''> {
 }
 
 export function run(game: Game, action: Action): { game: Game; effect: Effect } {
-  if (!validate(game, action)) {
+  if (!validate(game, action).ok) {
     throw new Error('invalid action')
   }
   return apply(
