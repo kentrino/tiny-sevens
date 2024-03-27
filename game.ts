@@ -159,14 +159,13 @@ export function run(game: Game, action: Action): RunResult {
       finish: finishStatus(newGame),
     }
   }
-  const next = nextPlayer(game)
   const { hands, field } = newGameAfterCardAction(game, action)
   const newGame = {
     ...game,
     field: field,
     hands: hands,
     turn: game.turn + 1,
-    currentPlayer: next,
+    currentPlayer: nextPlayer(game),
   }
   return {
     game: newGame,
