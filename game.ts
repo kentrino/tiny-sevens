@@ -142,14 +142,11 @@ export function run(game: Game, action: Action): RunResult {
     const initialPlayer = game.hands.findIndex((hand) =>
       hand.cards.some((card) => card.number === '7' && card.suit === 'D'),
     )
-    let field = game.field
-    for (const suit of suits) {
-      field = place(field, { number: '7', suit: suit })
-    }
+    const { hands, field } = newGameAfterInitialAction(game)
     const newGame = {
       ...game,
       field: field,
-      hands: newHandsAfterInitialAction(game.hands),
+      hands: hands,
       currentPlayer: initialPlayer,
       turn: 0,
     }
@@ -173,15 +170,22 @@ export function run(game: Game, action: Action): RunResult {
 }
 
 /**
- * Remove 7 from all hands
- * @param hands
+ * Place all 7s on the field and remove them from the hands.
+ * @param game
  */
-function newHandsAfterInitialAction(hands: Hand[]): Hand[] {
-  return hands.map((hand) => {
-    return {
-      cards: hand.cards.filter((card) => card.number !== '7'),
-    }
-  })
+function newGameAfterInitialAction(game: Game): { hands: Hand[], field: Field } {
+  let field = game.field
+  for (const suit of suits) {
+    field = place(field, { number: '7', suit: suit })
+  }
+  return {
+    field,
+    hands: game.hands.map((hand) => {
+      return {
+        cards: hand.cards.filter((card) => card.number !== '7'),
+      }
+    })
+  }
 }
 
 function newHandsAfterCardAction(hands: Hand[], action: CardAction): Hand[] {
