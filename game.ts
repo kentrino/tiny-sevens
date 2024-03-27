@@ -76,9 +76,6 @@ export function initialGame(numPlayers: number): Game {
   }
 }
 
-export function currentPlayer(game: Game) {
-  return game.turn % game.numPlayers
-}
 
 export function validate(game: Game, action: Action): Result<''> {
   if (action.type === 'initial') {
@@ -88,7 +85,7 @@ export function validate(game: Game, action: Action): Result<''> {
     return { ok: true, value: '' }
   }
   // check player
-  if (currentPlayer(game) !== action.player) {
+  if (game.currentPlayer !== action.player) {
     return { ok: false, error: 'not your turn' }
   }
   // check card
@@ -119,9 +116,15 @@ export function run(game: Game, action: Action): Game {
     throw new Error('invalid action')
   }
   if (action.type === 'skip') {
+    const next = nextPlayer(game)
+    if (!next.ok) {
+      // TODO: rewrite this into Result
+      throw new Error('game is finished')
+    }
     return {
       ...game,
       turn: game.turn + 1,
+      currentPlayer: next.value,
     }
   }
   if (action.type === 'initial') {
@@ -144,6 +147,11 @@ export function run(game: Game, action: Action): Game {
       turn: initialPlayer,
     }
   }
+  const next = nextPlayer(game)
+  if (!next.ok) {
+    // TODO: rewrite this into Result
+    throw new Error('game is finished')
+  }
   return {
     ...game,
     field: place(game.field, action.card),
@@ -156,6 +164,7 @@ export function run(game: Game, action: Action): Game {
       return hand
     }),
     turn: game.turn + 1,
+    currentPlayer: next.value,
   }
 }
 
@@ -170,6 +179,25 @@ export function canFinish(game: Game): Result<{ winner: number }> {
     }
   }
   return { ok: false, error: 'game is not finished' }
+}
+
+function nextPlayer(game: Game): Result<number> {
+  let current = game.currentPlayer
+  if (game.losers.length === game.numPlayers - 1) {
+    return {
+      ok: false,
+      error: 'game is finished',
+    }
+  }
+  while (true) {
+    current = (current + 1) % game.numPlayers
+    if (!game.losers.includes(current)) {
+      return {
+        ok: true,
+        value: current,
+      }
+    }
+  }
 }
 
 function initialField(): Field {

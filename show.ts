@@ -1,6 +1,5 @@
 import {
   type Card,
-  currentPlayer,
   type Field,
   type Game,
   numbers,
@@ -9,7 +8,7 @@ import {
 } from './game.ts'
 
 export function show(game: Game) {
-  const player = currentPlayer(game)
+  const player = game.currentPlayer
   const hand = game.hands[player]
   const playerDisplay = `Player ${player}'s`
   printField(game.field)

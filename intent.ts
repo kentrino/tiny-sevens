@@ -1,7 +1,6 @@
 import {
   type Action,
   type Card,
-  currentPlayer,
   type Rank,
   type Game,
   numbers,
@@ -12,7 +11,7 @@ import {
 import type { Result } from './result.ts'
 
 export function intent(game: Game, input: string): Result<Action> {
-  const player = currentPlayer(game)
+  const player = game.currentPlayer
   if (input === 'skip') {
     return { ok: true, value: { type: 'skip' as const, player } }
   }
