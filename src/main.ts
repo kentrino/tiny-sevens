@@ -2,8 +2,10 @@ import { type Game, initialGame, run } from './game.ts'
 import { show } from './show.ts'
 import { ask } from './ask.ts'
 import { intent } from './intent.ts'
+import { random } from './random.ts'
 
 export async function main() {
+  random('test seed')
   let game: Game = initialGame(4)
   const { game: _game } = run(game, { type: 'initial' })
   game = _game

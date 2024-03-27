@@ -20,5 +20,5 @@ function formatField(field: Field) {
 }
 
 function formatHand(hand: Hand) {
-  return hand.cards.map((card) => `${card.number}${card.suit}`).join(' ')
+  return hand.cards.map((card) => `${card.suit}${card.number}`).join(' ')
 }
