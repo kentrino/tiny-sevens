@@ -47,6 +47,7 @@ export type Game = {
   hands: Hand[]
   turn: number
   numPlayers: number
+  currentPlayer: number
 }
 
 export type Action =
@@ -67,6 +68,7 @@ export function initialGame(numPlayers: number): Game {
   return {
     field: initialField(),
     hands: shuffle(numPlayers),
+    currentPlayer: 0,
     turn: 0,
     numPlayers,
   }
@@ -136,6 +138,7 @@ export function run(game: Game, action: Action): Game {
           cards: hand.cards.filter((card) => card.number !== '7'),
         }
       }),
+      currentPlayer: initialPlayer,
       turn: initialPlayer,
     }
   }
