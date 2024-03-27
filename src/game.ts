@@ -99,9 +99,10 @@ export function validate(game: Game, action: Action): Result<''> {
     }
     return { ok: true, value: '' }
   }
-  if (game.turn === 0) {
-    return { ok: false, error: 'game has not started yet' }
-  }
+  // TODO: check if 7s are placed
+  // if (game.turn === 0) {
+  //   return { ok: false, error: 'game has not started yet' }
+  // }
   // check player
   if (game.currentPlayer !== action.player) {
     return { ok: false, error: 'not your turn' }
@@ -127,8 +128,9 @@ export function validate(game: Game, action: Action): Result<''> {
 }
 
 export function run(game: Game, action: Action): { game: Game; effect: Effect } {
-  if (!validate(game, action).ok) {
-    throw new Error('invalid action')
+  const res = validate(game, action)
+  if (!res.ok) {
+    throw new Error(`invalid action: ${res.error}`)
   }
   return apply(
     [
