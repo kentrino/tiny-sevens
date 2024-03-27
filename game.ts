@@ -132,7 +132,7 @@ export function run(game: Game, action: Action): RunResult {
   }
   if (action.type === 'skip') {
     const newSkips = game.skips.map((s, i) => (i === game.currentPlayer ? s + 1 : s))
-    const newLoser = newSkips.findIndex((s) => s === 3)
+    const newLoser = newSkips.findIndex((s) => s > 3)
     const newGame = {
       ...game,
       skips: newSkips,
