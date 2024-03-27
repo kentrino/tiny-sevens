@@ -48,27 +48,6 @@ export type Game = {
   numPlayers: number
 }
 
-function initialField(): Field {
-  const u = undefined
-  return {
-    fields: {
-      S: [u, u, u, u, u, u, {number: '7', suit: 'S'}, u, u, u, u, u, u, u],
-      H: [u, u, u, u, u, u, {number: '7', suit: 'H'}, u, u, u, u, u, u, u],
-      D: [u, u, u, u, u, u, {number: '7', suit: 'D'}, u, u, u, u, u, u, u],
-      C: [u, u, u, u, u, u, {number: '7', suit: 'C'}, u, u, u, u, u, u, u],
-    }
-  }
-}
-
-export function initialGame(numPlayers: number): Game {
-  return {
-    field: initialField(),
-    hands: shuffle(numPlayers),
-    turn: 0,
-    numPlayers
-  }
-}
-
 export type Action = {
   player: number
   type: 'skip'
@@ -78,44 +57,12 @@ export type Action = {
   card: Card
 }
 
-function canPlace(field: Field, card: Card): Result<''> {
-  const rightPlace = numbers.indexOf(card.number)
-  if (rightPlace < 7) {
-    const right = rightPlace + 1
-    const ok = typeof field.fields[card.suit][right] !== 'undefined'
-    if (ok) {
-      return { ok: true, value: '' }
-    }
-    return {
-      ok: false,
-      error: 'right-hand neighbor is empty'
-    }
-  }
-  const left = rightPlace - 1
-  const ok = typeof field.fields[card.suit][left] !== 'undefined'
-  if (ok) {
-    return { ok: true, value: '' }
-  }
+export function initialGame(numPlayers: number): Game {
   return {
-    ok: false,
-    error: 'left-hand neighbor is empty'
-  }
-}
-
-function place(field: Field, card: Card): Field {
-  const copied = copy(field)
-  const rightPlace = numbers.indexOf(card.number)
-  const newRow = copied.fields[card.suit].map((c, i) => {
-    if (i === rightPlace) {
-      return card
-    }
-    return c
-  })
-  return {
-    fields: {
-      ...copied.fields,
-      [card.suit]: newRow
-    }
+    field: initialField(),
+    hands: shuffle(numPlayers),
+    turn: 0,
+    numPlayers
   }
 }
 
@@ -181,4 +128,57 @@ export function winner(game: Game): number | undefined {
     return undefined
   }
   return game.hands.findIndex((hand) => hand.cards.length === 0)
+}
+
+function initialField(): Field {
+  const u = undefined
+  return {
+    fields: {
+      S: [u, u, u, u, u, u, {number: '7', suit: 'S'}, u, u, u, u, u, u, u],
+      H: [u, u, u, u, u, u, {number: '7', suit: 'H'}, u, u, u, u, u, u, u],
+      D: [u, u, u, u, u, u, {number: '7', suit: 'D'}, u, u, u, u, u, u, u],
+      C: [u, u, u, u, u, u, {number: '7', suit: 'C'}, u, u, u, u, u, u, u],
+    }
+  }
+}
+
+function canPlace(field: Field, card: Card): Result<''> {
+  const rightPlace = numbers.indexOf(card.number)
+  if (rightPlace < 7) {
+    const right = rightPlace + 1
+    const ok = typeof field.fields[card.suit][right] !== 'undefined'
+    if (ok) {
+      return { ok: true, value: '' }
+    }
+    return {
+      ok: false,
+      error: 'right-hand neighbor is empty'
+    }
+  }
+  const left = rightPlace - 1
+  const ok = typeof field.fields[card.suit][left] !== 'undefined'
+  if (ok) {
+    return { ok: true, value: '' }
+  }
+  return {
+    ok: false,
+    error: 'left-hand neighbor is empty'
+  }
+}
+
+function place(field: Field, card: Card): Field {
+  const copied = copy(field)
+  const rightPlace = numbers.indexOf(card.number)
+  const newRow = copied.fields[card.suit].map((c, i) => {
+    if (i === rightPlace) {
+      return card
+    }
+    return c
+  })
+  return {
+    fields: {
+      ...copied.fields,
+      [card.suit]: newRow
+    }
+  }
 }
