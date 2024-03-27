@@ -133,8 +133,11 @@ export function run(game: Game, action: Action): RunResult {
   if (action.type === 'skip') {
     const newSkips = game.skips.map((s, i) => (i === game.currentPlayer ? s + 1 : s))
     const newLoser = newSkips.findIndex((s) => s > 3)
+    const { field, hands } = placeLosersHand(game, newLoser)
     const newGame: Game = {
       ...game,
+      field,
+      hands,
       skips: newSkips,
       turn: game.turn + 1,
       currentPlayer: nextPlayer(game),
@@ -177,6 +180,33 @@ function findPlayerWithCard(hands: Hand[], card: Card): number {
   return hands.findIndex((hand) =>
     hand.cards.some((c) => c.number === card.number && c.suit === card.suit),
   )
+}
+
+/**
+ * Place the loser's hand on the field and remove it from the hand.
+ * @param hands
+ * @param field
+ * @param loser
+ */
+function placeLosersHand({hands, field}: Pick<Game, "hands" | "field">, loser: number): Pick<Game, "hands" | "field"> {
+  if (loser < 0) {
+    return {hands, field}
+  }
+  if (loser >= hands.length) {
+    throw new Error('Invalid loser index')
+  }
+  const loserHand = hands[loser]
+  const newField = loserHand.cards.reduce((f, card) => place(f, card), field)
+  const newHands = hands.map((hand, i) => {
+    if (i === loser) {
+      return {cards: []}
+    }
+    return hand
+  })
+  return {
+    hands: newHands,
+    field: newField,
+  }
 }
 
 /**
