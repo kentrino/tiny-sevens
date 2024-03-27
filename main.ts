@@ -17,7 +17,7 @@ export async function main() {
       continue
     }
     const { game: newGame, effect } = run(game, mayBeAction.value)
-    if (!effect.newLoser) {
+    if (typeof effect.newLoser !== "undefined" && effect.newLoser !== -1) {
       console.log('Player', effect.newLoser, 'is out!')
     }
     if (!effect.continue) {
