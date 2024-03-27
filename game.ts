@@ -119,15 +119,12 @@ export function run(game: Game, action: Action): Game {
   }
 }
 
-export function canContinue(game: Game): boolean {
-  return game.hands.every((hand) => hand.cards.length > 0)
-}
-
-export function winner(game: Game): number | undefined {
-  if (canContinue(game)) {
-    return undefined
+export function canFinish(game: Game): Result<{ winner: number }> {
+  const canFinish = game.hands.some((hand) => hand.cards.length === 0)
+  if (canFinish) {
+    return { ok: true, value: { winner: game.hands.findIndex((hand) => hand.cards.length === 0) } }
   }
-  return game.hands.findIndex((hand) => hand.cards.length === 0)
+  return { ok: false, error: 'game is not finished' }
 }
 
 function initialField(): Field {

@@ -1,4 +1,4 @@
-import { canContinue, type Game, initialGame, run, winner } from "./game.ts"
+import { canFinish, type Game, initialGame, run } from "./game.ts"
 import { show } from "./show.ts"
 import { ask } from "./ask.ts"
 import { intent } from "./intent.ts"
@@ -15,9 +15,10 @@ export async function main() {
         continue
     }
     game = run(game, mayBeAction.value)
-    if (!canContinue(game)) {
+    const res = canFinish(game)
+    if (res.ok) {
+      console.log("Game finished! Winner is player:", res.value.winner)
       break
     }
   }
-  console.log("Game finished! Winner is player:", winner(game))
 }
