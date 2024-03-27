@@ -53,20 +53,6 @@ export type Game = {
   skips: number[]
 }
 
-type FinishStatus =
-  | {
-      status: true
-      winner: number
-    }
-  | {
-      status: false
-    }
-
-type RunResult = {
-  game: Game
-  finish: FinishStatus
-}
-
 type CardAction = {
   player: number
   type: 'card'
@@ -82,6 +68,17 @@ export type Action =
   | {
       type: 'initial'
     }
+
+type Effect = {
+  continue: boolean
+  newLoser?: number
+  winner?: number
+}
+
+type PartialRule<T extends keyof Game> = (
+  game: Game,
+  action: Action,
+) => { game: Pick<Game, T>; effect?: Effect }
 
 export function initialGame(numPlayers: number): Game {
   return {
@@ -126,61 +123,15 @@ export function validate(game: Game, action: Action): Result<''> {
   return { ok: true, value: '' }
 }
 
-export function run(game: Game, action: Action): RunResult {
+export function run(game: Game, action: Action): { game: Game; effect: Effect } {
   if (!validate(game, action)) {
     throw new Error('invalid action')
   }
-  if (action.type === 'skip') {
-    const newSkips = game.skips.map((s, i) => (i === game.currentPlayer ? s + 1 : s))
-    const newLoser = newSkips.findIndex((s) => s > 3)
-    const { field, hands } = placeLosersHand(game, newLoser)
-    let newLosers = game.losers
-    if (newLoser !== -1 && !game.losers.includes(newLoser)) {
-      newLosers = [...game.losers, newLoser]
-    }
-    const newGame: Game = {
-      ...game,
-      field,
-      hands,
-      skips: newSkips,
-      turn: game.turn + 1,
-      currentPlayer: nextPlayer({
-        ...game,
-        losers: newLosers,
-      }),
-      losers: newLosers,
-    }
-    return {
-      game: newGame,
-      finish: finishStatus(newGame),
-    }
-  }
-  if (action.type === 'initial') {
-    const { hands, field } = newGamePartialAfterInitialAction(game)
-    const newGame: Game = {
-      ...game,
-      field: field,
-      hands: hands,
-      currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }),
-      turn: 0,
-    }
-    return {
-      game: newGame,
-      finish: finishStatus(newGame),
-    }
-  }
-  const { hands, field } = newGamePartialAfterCardAction(game, action)
-  const newGame: Game = {
-    ...game,
-    field: field,
-    hands: hands,
-    turn: game.turn + 1,
-    currentPlayer: nextPlayer(game),
-  }
-  return {
-    game: newGame,
-    finish: finishStatus(newGame),
-  }
+  return apply(
+    [handAndFieldRule, skipRule, loserRule, nextPlayerRule, nextTurnRule, finishRule],
+    game,
+    action,
+  )
 }
 
 const handAndFieldRule: PartialRule<'hands' | 'field'> = (game, action) => {
@@ -301,26 +252,11 @@ const finishRule: PartialRule<'losers'> = (game, _) => {
   return { game }
 }
 
-type Effect = {
-  continue: boolean
-  newLoser?: number
-  winner?: number
-}
-
-type PartialRule<T extends keyof Game> = (
+function apply(
+  rules: PartialRule<never>[],
   game: Game,
   action: Action,
-) => { game: Pick<Game, T>; effect?: Effect }
-
-function apply(game: Game, action: Action): { game: Game; effect: Effect } {
-  const rules: PartialRule<never>[] = [
-    handAndFieldRule,
-    skipRule,
-    loserRule,
-    nextPlayerRule,
-    nextTurnRule,
-    finishRule,
-  ]
+): { game: Game; effect: Effect } {
   return rules.reduce(
     (acc, rule): { game: Game; effect: Effect } => {
       const { game, effect } = rule(acc.game, action)
@@ -421,26 +357,6 @@ function newGamePartialAfterCardAction(
       return hand
     }),
   }
-}
-
-export function finishStatus(game: Game): FinishStatus {
-  if (game.losers.length === game.numPlayers - 1) {
-    const winner = range(game.numPlayers).find((i) => !game.losers.includes(i))
-    if (typeof winner === 'undefined') {
-      throw new Error('Illegal state')
-    }
-    return { status: true, winner }
-  }
-  const canFinish = game.hands.some(
-    (hand, player) => hand.cards.length === 0 && !game.losers.includes(player),
-  )
-  if (canFinish) {
-    return {
-      status: true,
-      winner: game.hands.findIndex((hand) => hand.cards.length === 0),
-    }
-  }
-  return { status: false }
 }
 
 function nextPlayer(game: Game): number {

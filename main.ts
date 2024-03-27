@@ -1,4 +1,4 @@
-import { finishStatus, type Game, initialGame, run } from './game.ts'
+import { type Game, initialGame, run } from './game.ts'
 import { show } from './show.ts'
 import { ask } from './ask.ts'
 import { intent } from './intent.ts'
@@ -16,11 +16,14 @@ export async function main() {
       console.log(`Invalid move: ${mayBeAction.error}`)
       continue
     }
-    const runResult = run(game, mayBeAction.value)
-    if (runResult.finish.status) {
-      console.log('Game finished! Winner is player:', runResult.finish.winner)
+    const { game: newGame, effect } = run(game, mayBeAction.value)
+    if (!effect.newLoser) {
+      console.log('Player', effect.newLoser, 'is out!')
+    }
+    if (!effect.continue) {
+      console.log('Game finished! Winner is player:', effect.winner)
       break
     }
-    game = runResult.game
+    game = newGame
   }
 }
