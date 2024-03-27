@@ -244,6 +244,10 @@ const nextTurnRule: PartialRule<'turn'> = (game, action) => {
 }
 
 const finishRule: PartialRule<'losers'> = (game, _) => {
+  function playerCanWin(hand: Hand, player: number): boolean {
+    return hand.cards.length === 0 && !game.losers.includes(player)
+  }
+
   if (game.losers.length === game.numPlayers - 1) {
     const winner = range(game.numPlayers).find((i) => !game.losers.includes(i))
     if (typeof winner === 'undefined') {
@@ -257,17 +261,13 @@ const finishRule: PartialRule<'losers'> = (game, _) => {
       },
     }
   }
-  const canFinish = game.hands.some(
-    (hand, player) => hand.cards.length === 0 && !game.losers.includes(player),
-  )
+  const canFinish = game.hands.some(playerCanWin)
   if (canFinish) {
     return {
       game,
       effect: {
         continue: false,
-        winner: game.hands.findIndex(
-          (hand, player) => hand.cards.length === 0 && !game.losers.includes(player),
-        ),
+        winner: game.hands.findIndex(playerCanWin),
       },
     }
   }
