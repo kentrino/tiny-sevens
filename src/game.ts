@@ -7,7 +7,6 @@ export type Rank = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | '
 export const numbers = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'J', 'Q', 'K'] as const
 
 export type Suit = 'S' | 'H' | 'D' | 'C'
-
 export const suits = ['S', 'H', 'D', 'C'] as const
 
 export type Card = {
@@ -15,12 +14,10 @@ export type Card = {
   suit: Suit
 }
 
-type _Card<N extends Rank, S extends Suit> = {
+type _Cell<N extends Rank, S extends Suit> = {
   rank: N
   suit: S
-}
-
-type _Cell<N extends Rank, S extends Suit> = _Card<N, S> | undefined
+} | undefined
 type S<N extends Rank> = _Cell<N, 'S'>
 type H<N extends Rank> = _Cell<N, 'H'>
 type D<N extends Rank> = _Cell<N, 'D'>
