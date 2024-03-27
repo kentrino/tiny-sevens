@@ -20,8 +20,7 @@ export async function main() {
     if (runResult.finish.status) {
       console.log('Game finished! Winner is player:', runResult.finish.winner)
       break
-    } else {
-      game = runResult.game
     }
+    game = runResult.game
   }
 }

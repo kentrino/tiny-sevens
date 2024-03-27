@@ -53,12 +53,14 @@ export type Game = {
   skips: number[]
 }
 
-type FinishStatus = {
-  status: true
-  winner: number
-} | {
-  status: false
-}
+type FinishStatus =
+  | {
+      status: true
+      winner: number
+    }
+  | {
+      status: false
+    }
 
 type RunResult = {
   game: Game
@@ -168,7 +170,7 @@ export function run(game: Game, action: Action): RunResult {
   }
   return {
     game: newGame,
-    finish: finishStatus(newGame)
+    finish: finishStatus(newGame),
   }
 }
 
@@ -182,7 +184,7 @@ function findPlayerWithCard(hands: Hand[], card: Card): number {
  * Place all 7s on the field and remove them from the hands.
  * @param game
  */
-function newGameAfterInitialAction(game: Game): Pick<Game, "hands" | "field"> {
+function newGameAfterInitialAction(game: Game): Pick<Game, 'hands' | 'field'> {
   let field = game.field
   for (const suit of suits) {
     field = place(field, { number: '7', suit: suit })
@@ -193,11 +195,11 @@ function newGameAfterInitialAction(game: Game): Pick<Game, "hands" | "field"> {
       return {
         cards: hand.cards.filter((card) => card.number !== '7'),
       }
-    })
+    }),
   }
 }
 
-function newGameAfterCardAction(game: Game, action: CardAction): Pick<Game, "hands" | "field">{
+function newGameAfterCardAction(game: Game, action: CardAction): Pick<Game, 'hands' | 'field'> {
   function isSame(a: Card, b: Card): boolean {
     return a.number === b.number && a.suit === b.suit
   }
@@ -210,7 +212,7 @@ function newGameAfterCardAction(game: Game, action: CardAction): Pick<Game, "han
         }
       }
       return hand
-    })
+    }),
   }
 }
 
