@@ -99,6 +99,9 @@ export function validate(game: Game, action: Action): Result<''> {
     }
     return { ok: true, value: '' }
   }
+  if (game.turn === 0) {
+    return { ok: false, error: 'game has not started yet' }
+  }
   // check player
   if (game.currentPlayer !== action.player) {
     return { ok: false, error: 'not your turn' }
