@@ -2,7 +2,7 @@ import {
   type Action,
   type Card,
   currentPlayer,
-  type Number,
+  type Rank,
   type Game,
   numbers,
   type Suit,
@@ -61,7 +61,7 @@ function asCard(input: string): Result<Card> {
   return {
     ok: true,
     value: {
-      number: number as Number,
+      number: number as Rank,
       suit: suit as Suit
     }
   }

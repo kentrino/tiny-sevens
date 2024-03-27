@@ -2,7 +2,7 @@ import { shuffle } from "./shuffle.ts"
 import { copy } from "./copy.ts"
 import type { Result } from "./result.ts"
 
-export type Number = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | 'J' | 'Q' | 'K'
+export type Rank = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | 'J' | 'Q' | 'K'
 export const numbers = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'J', 'Q', 'K'] as const
 
 export type Suit = 'S' | 'H' | 'D' | 'C'
@@ -10,20 +10,20 @@ export type Suit = 'S' | 'H' | 'D' | 'C'
 export const suits = ['S', 'H', 'D', 'C'] as const
 
 export type Card = {
-  number: Number
+  number: Rank
   suit: Suit
 }
 
-type _Card<N extends Number, S extends Suit> = {
+type _Card<N extends Rank, S extends Suit> = {
   number: N
   suit: S
 }
 
-type _Cell<N extends Number, S extends Suit> = _Card<N, S> | undefined
-type S<N extends Number> = _Cell<N, 'S'>
-type H<N extends Number> = _Cell<N, 'H'>
-type D<N extends Number> = _Cell<N, 'D'>
-type C<N extends Number> = _Cell<N, 'C'>
+type _Cell<N extends Rank, S extends Suit> = _Card<N, S> | undefined
+type S<N extends Rank> = _Cell<N, 'S'>
+type H<N extends Rank> = _Cell<N, 'H'>
+type D<N extends Rank> = _Cell<N, 'D'>
+type C<N extends Rank> = _Cell<N, 'C'>
 
 /**
  * This precise type definition is not essential for the implementation; it merely delineates the rules of the game.

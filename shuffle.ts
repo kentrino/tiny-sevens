@@ -1,4 +1,4 @@
-import { type Number, type Suit, type Card, type Hand, numbers, suits } from "./game.ts"
+import { type Rank, type Suit, type Card, type Hand, numbers, suits } from "./game.ts"
 
 export function shuffle(numPlayers: number): Hand[] {
   const cards: Card[] = numbers.flatMap((number) => suits.map((suit) => ({
