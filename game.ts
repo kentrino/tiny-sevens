@@ -134,14 +134,18 @@ export function run(game: Game, action: Action): RunResult {
     const newSkips = game.skips.map((s, i) => (i === game.currentPlayer ? s + 1 : s))
     const newLoser = newSkips.findIndex((s) => s > 3)
     const { field, hands } = placeLosersHand(game, newLoser)
+    const newLosers: number[] = newLoser === -1 ? game.losers : [...game.losers, newLoser]
     const newGame: Game = {
       ...game,
       field,
       hands,
       skips: newSkips,
       turn: game.turn + 1,
-      currentPlayer: nextPlayer(game),
-      losers: newLoser === -1 ? game.losers : [...game.losers, newLoser],
+      currentPlayer: nextPlayer({
+        ...game,
+        losers: newLosers,
+      }),
+      losers: newLosers,
     }
     return {
       game: newGame,
