@@ -129,13 +129,14 @@ export function run(game: Game, action: Action): RunResult {
   }
   if (action.type === 'skip') {
     const next = nextPlayer(game)
+    const newGame = {
+      ...game,
+      turn: game.turn + 1,
+      currentPlayer: next,
+    }
     return {
-      finish: { status: false },
-      game: {
-        ...game,
-        turn: game.turn + 1,
-        currentPlayer: next,
-      }
+      game: newGame,
+      finish: finishStatus(newGame),
     }
   }
   if (action.type === 'initial') {
@@ -146,38 +147,40 @@ export function run(game: Game, action: Action): RunResult {
     for (const suit of suits) {
       field = place(field, { number: '7', suit: suit })
     }
+    const newGame = {
+      ...game,
+      field: field,
+      hands: game.hands.map((hand) => {
+        return {
+          cards: hand.cards.filter((card) => card.number !== '7'),
+        }
+      }),
+      currentPlayer: initialPlayer,
+      turn: initialPlayer,
+    }
     return {
-      game: {
-        ...game,
-        field: field,
-        hands: game.hands.map((hand) => {
-          return {
-            cards: hand.cards.filter((card) => card.number !== '7'),
-          }
-        }),
-        currentPlayer: initialPlayer,
-        turn: initialPlayer,
-      },
-      finish: { status: false },
+      game: newGame,
+      finish: finishStatus(newGame),
     }
   }
   const next = nextPlayer(game)
-  return {
-    game: {
-      ...game,
-      field: place(game.field, action.card),
-      hands: game.hands.map((hand, player) => {
-        if (player === action.player) {
-          return {
-            cards: hand.cards.filter((card) => !isSame(card, action.card)),
-          }
+  const newGame = {
+    ...game,
+    field: place(game.field, action.card),
+    hands: game.hands.map((hand, player) => {
+      if (player === action.player) {
+        return {
+          cards: hand.cards.filter((card) => !isSame(card, action.card)),
         }
-        return hand
-      }),
-      turn: game.turn + 1,
-      currentPlayer: next,
-    },
-    finish: { status: false},
+      }
+      return hand
+    }),
+    turn: game.turn + 1,
+    currentPlayer: next,
+  }
+  return {
+    game: newGame,
+    finish: finishStatus(newGame)
   }
 }
 
