@@ -133,12 +133,12 @@ export function run(game: Game, action: Action): RunResult {
   if (action.type === 'skip') {
     const newSkips = game.skips.map((s, i) => (i === game.currentPlayer ? s + 1 : s))
     const newLoser = newSkips.findIndex((s) => s > 3)
-    const newGame = {
+    const newGame: Game = {
       ...game,
       skips: newSkips,
       turn: game.turn + 1,
       currentPlayer: nextPlayer(game),
-      loser: typeof newLoser === 'undefined' ? game.losers : [...game.losers, newLoser],
+      losers: newLoser === -1 ? game.losers : [...game.losers, newLoser],
     }
     return {
       game: newGame,
@@ -147,7 +147,7 @@ export function run(game: Game, action: Action): RunResult {
   }
   if (action.type === 'initial') {
     const { hands, field } = newGamePartialAfterInitialAction(game)
-    const newGame = {
+    const newGame: Game = {
       ...game,
       field: field,
       hands: hands,
@@ -160,7 +160,7 @@ export function run(game: Game, action: Action): RunResult {
     }
   }
   const { hands, field } = newGamePartialAfterCardAction(game, action)
-  const newGame = {
+  const newGame: Game = {
     ...game,
     field: field,
     hands: hands,
