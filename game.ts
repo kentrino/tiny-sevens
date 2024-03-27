@@ -18,12 +18,16 @@ type _Card<N extends Number, S extends Suit> = {
   number: N
   suit: S
 }
+
 type _Cell<N extends Number, S extends Suit> = _Card<N, S> | undefined
 type S<N extends Number> = _Cell<N, 'S'>
 type H<N extends Number> = _Cell<N, 'H'>
 type D<N extends Number> = _Cell<N, 'D'>
 type C<N extends Number> = _Cell<N, 'C'>
 
+/**
+ * This precise type definition is not essential for the implementation; it merely delineates the rules of the game.
+ */
 export type Field = {
   fields: {
     S: [S<'A'>, S<'2'>, S<'3'>, S<'4'>, S<'5'>, S<'6'>, S<'7'>, S<'8'>, S<'9'>, S<'0'>, S<'J'>, S<'J'>, S<'Q'>, S<'K'>],
