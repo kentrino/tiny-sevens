@@ -149,11 +149,7 @@ export function run(game: Game, action: Action): RunResult {
     const newGame = {
       ...game,
       field: field,
-      hands: game.hands.map((hand) => {
-        return {
-          cards: hand.cards.filter((card) => card.number !== '7'),
-        }
-      }),
+      hands: newHandsAfterInitialAction(game.hands),
       currentPlayer: initialPlayer,
       turn: 0,
     }
@@ -174,6 +170,18 @@ export function run(game: Game, action: Action): RunResult {
     game: newGame,
     finish: finishStatus(newGame)
   }
+}
+
+/**
+ * Remove 7 from all hands
+ * @param hands
+ */
+function newHandsAfterInitialAction(hands: Hand[]): Hand[] {
+  return hands.map((hand) => {
+    return {
+      cards: hand.cards.filter((card) => card.number !== '7'),
+    }
+  })
 }
 
 function newHandsAfterCardAction(hands: Hand[], action: CardAction): Hand[] {
