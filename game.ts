@@ -183,30 +183,43 @@ export function run(game: Game, action: Action): RunResult {
   }
 }
 
+const handAndFieldRule: PartialRule<'hands' | "field"> = (game, action) => {
+  switch (action.type) {
+    case 'skip': {
+      return {
+        game: game,
+      }
+    }
+    case 'initial': {
+      const { hands, field } = newGamePartialAfterInitialAction(game)
+      return {
+        game: { hands, field },
+      }
+    }
+    case 'card': {
+      const { hands, field } = newGamePartialAfterCardAction(game, action)
+      return {
+        game: { hands, field },
+      }
+    }
+  }
+}
+
 const ruleNextPlayers: PartialRule<'currentPlayer'> = (game, action) => {
   switch (action.type) {
     case 'skip': {
       return {
         game: { currentPlayer: nextPlayer(game) },
-        effect: {
-          continue: true,
-        },
       }
     }
     case 'initial': {
       return {
         game: { currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }) },
-        effect: {
-          continue: true,
-        },
       }
     }
     case 'card': {
       return {
         game: { currentPlayer: nextPlayer(game) },
-        effect: {
-          continue: true,
-        },
       }
     }
   }
@@ -220,18 +233,19 @@ type Effect = {
 type PartialRule<T extends keyof Game> = (
   game: Game,
   action: Action,
-) => { game: Pick<Game, T>; effect: Effect }
+) => { game: Pick<Game, T>; effect?: Effect }
 
 function apply(game: Game, action: Action): { game: Game; effect: Effect } {
   const rules: PartialRule<never>[] = [ruleNextPlayers]
   return rules.reduce(
     (acc, rule): { game: Game; effect: Effect } => {
       const { game, effect } = rule(acc.game, action)
+      const defaultContinue = true
       return {
         game: { ...acc.game, ...game },
         effect: {
-          continue: acc.effect.continue && effect.continue,
-          newLoser: effect.newLoser ?? acc.effect.newLoser,
+          continue: acc.effect.continue && (effect?.continue ?? defaultContinue),
+          newLoser: effect?.newLoser ?? acc.effect.newLoser,
         },
       }
     },
