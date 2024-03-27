@@ -14,10 +14,12 @@ export type Card = {
   suit: Suit
 }
 
-type _Cell<N extends Rank, S extends Suit> = {
-  rank: N
-  suit: S
-} | undefined
+type _Cell<N extends Rank, S extends Suit> =
+  | {
+      rank: N
+      suit: S
+    }
+  | undefined
 type S<N extends Rank> = _Cell<N, 'S'>
 type H<N extends Rank> = _Cell<N, 'H'>
 type D<N extends Rank> = _Cell<N, 'D'>
@@ -112,9 +114,7 @@ export function validate(game: Game, action: Action): Result<''> {
     // check hand
     const hand = game.hands[action.player]
     if (
-      !hand.cards.some(
-        (card) => card.rank === action.card.rank && card.suit === action.card.suit,
-      )
+      !hand.cards.some((card) => card.rank === action.card.rank && card.suit === action.card.suit)
     ) {
       return { ok: false, error: 'you do not have the card' }
     }
