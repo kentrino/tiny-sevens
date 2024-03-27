@@ -48,6 +48,7 @@ export type Game = {
   turn: number
   numPlayers: number
   currentPlayer: number
+  losers: number[]
 }
 
 export type Action =
@@ -71,6 +72,7 @@ export function initialGame(numPlayers: number): Game {
     currentPlayer: 0,
     turn: 0,
     numPlayers,
+    losers: [],
   }
 }
 
