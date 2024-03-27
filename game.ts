@@ -183,6 +183,24 @@ export function run(game: Game, action: Action): RunResult {
   }
 }
 
+const ruleNextPlayers: PartialRule<"currentPlayer"> = {
+  currentPlayer: (game, action) => {
+    switch (action.type) {
+      case 'skip': {
+        return { currentPlayer: nextPlayer(game) }
+      }
+      case 'initial': {
+        return { currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }) }
+      }
+      case 'card': {
+        return { currentPlayer: nextPlayer(game) }
+      }
+    }
+  }
+}
+
+type PartialRule<T extends keyof Game> = { [key in T]: (game: Game, action: Action) => Pick<Game, T> }
+
 function findPlayerWithCard(hands: Hand[], card: Card): number {
   return hands.findIndex((hand) =>
     hand.cards.some((c) => c.number === card.number && c.suit === card.suit),
