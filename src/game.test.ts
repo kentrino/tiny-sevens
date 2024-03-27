@@ -86,4 +86,51 @@ describe('game', () => {
       turn: 1,
     })
   })
+  it('many skips', () => {
+    initializeRandomWithSeed()
+    const startGame = initialGame(4)
+    const actions: Action[] = [
+      { type: 'initial' },
+      { type: 'card', card: { number: '8', suit: 'S' }, player: 0 },
+      { type: 'skip', player: 1 },
+      { type: 'card', card: { number: '6', suit: 'H' }, player: 2 },
+      { type: 'card', card: { number: '8', suit: 'H' }, player: 3 },
+      { type: 'card', card: { number: '5', suit: 'H' }, player: 0 },
+      { type: 'skip', player: 1 },
+      { type: 'card', card: { number: '8', suit: 'C' }, player: 2 },
+      { type: 'card', card: { number: '6', suit: 'C' }, player: 3 },
+      { type: 'card', card: { number: '9', suit: 'S' }, player: 0 },
+      { type: 'skip', player: 1 },
+      { type: 'card', card: { number: '9', suit: 'H' }, player: 2 },
+      { type: 'card', card: { number: '6', suit: 'D' }, player: 3 },
+      { type: 'skip', player: 0 },
+      { type: 'skip', player: 1 },
+    ]
+    const { game, effect } = apply(actions, startGame)
+    expect(format(game)).toEqual({
+      currentPlayer: 2,
+      field: {
+        C: "....5678......",
+        D: "....56789...K.",
+        H: "A2.4567890.Q..",
+        S: "A.....7890J...",
+      },
+      hands: [
+        "SK S2 CK C0 D0 HJ CA HK SQ",
+        "",
+        "C9 DJ DA CQ CJ DQ S3 C3 D2 D3",
+        "C2 C4 H3 S4 S6 D4 S5"
+      ],
+      losers: [
+        1
+      ],
+      numPlayers: 4,
+      skips: [1, 4, 0, 0],
+      turn: 14,
+    })
+    expect(effect).toEqual({
+      newLoser: 1,
+      continue: true
+    })
+  })
 })
