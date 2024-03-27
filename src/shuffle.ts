@@ -1,4 +1,5 @@
 import { type Rank, type Suit, type Card, type Hand, numbers, suits } from './game.ts'
+import { random } from "./random.ts"
 
 export function shuffle(numPlayers: number): Hand[] {
   const cards: Card[] = numbers.flatMap((number) =>
@@ -7,7 +8,7 @@ export function shuffle(numPlayers: number): Hand[] {
       suit,
     })),
   )
-  const shuffled = cards.sort(() => Math.random() - 0.5)
+  const shuffled = cards.sort(() => random() - 0.5)
   const hands = chunk(shuffled, Math.floor(cards.length / numPlayers))
   return hands.map((cards) => ({ cards }))
 }
