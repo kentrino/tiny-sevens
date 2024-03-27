@@ -1,4 +1,4 @@
-import { canFinish, type Game, initialGame, run } from './game.ts'
+import { finishStatus, type Game, initialGame, run } from './game.ts'
 import { show } from './show.ts'
 import { ask } from './ask.ts'
 import { intent } from './intent.ts'

@@ -181,24 +181,22 @@ export function run(game: Game, action: Action): RunResult {
   }
 }
 
-export function canFinish(game: Game): Result<{ winner: number }> {
+export function finishStatus(game: Game): FinishStatus {
   if (game.losers.length === game.numPlayers - 1) {
     const winner = range(game.numPlayers).find((i) => !game.losers.includes(i))
     if (typeof winner === 'undefined') {
       throw new Error('Illegal state')
     }
-    return { ok: true, value: { winner } }
+    return { status: true, winner }
   }
   const canFinish = game.hands.some((hand) => hand.cards.length === 0)
   if (canFinish) {
     return {
-      ok: true,
-      value: {
-        winner: game.hands.findIndex((hand) => hand.cards.length === 0),
-      },
+      status: true,
+      winner: game.hands.findIndex((hand) => hand.cards.length === 0),
     }
   }
-  return { ok: false, error: 'game is not finished' }
+  return { status: false }
 }
 
 function nextPlayer(game: Game): number {
