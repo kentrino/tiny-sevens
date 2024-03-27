@@ -183,23 +183,66 @@ export function run(game: Game, action: Action): RunResult {
   }
 }
 
-const ruleNextPlayers: PartialRule<"currentPlayer"> = {
-  currentPlayer: (game, action) => {
-    switch (action.type) {
-      case 'skip': {
-        return { currentPlayer: nextPlayer(game) }
+const ruleNextPlayers: PartialRule<'currentPlayer'> = (game, action) => {
+  switch (action.type) {
+    case 'skip': {
+      return {
+        game: { currentPlayer: nextPlayer(game) },
+        effect: {
+          continue: true,
+        },
       }
-      case 'initial': {
-        return { currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }) }
+    }
+    case 'initial': {
+      return {
+        game: { currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }) },
+        effect: {
+          continue: true,
+        },
       }
-      case 'card': {
-        return { currentPlayer: nextPlayer(game) }
+    }
+    case 'card': {
+      return {
+        game: { currentPlayer: nextPlayer(game) },
+        effect: {
+          continue: true,
+        },
       }
     }
   }
 }
 
-type PartialRule<T extends keyof Game> = { [key in T]: (game: Game, action: Action) => Pick<Game, T> }
+type Effect = {
+  continue: boolean
+  newLoser?: number
+}
+
+type PartialRule<T extends keyof Game> = (
+  game: Game,
+  action: Action,
+) => { game: Pick<Game, T>; effect: Effect }
+
+function apply(game: Game, action: Action): { game: Game; effect: Effect } {
+  const rules: PartialRule<never>[] = [ruleNextPlayers]
+  return rules.reduce(
+    (acc, rule): { game: Game; effect: Effect } => {
+      const { game, effect } = rule(acc.game, action)
+      return {
+        game: { ...acc.game, ...game },
+        effect: {
+          continue: acc.effect.continue && effect.continue,
+          newLoser: effect.newLoser ?? acc.effect.newLoser,
+        },
+      }
+    },
+    {
+      game,
+      effect: {
+        continue: true,
+      } as Effect,
+    },
+  )
+}
 
 function findPlayerWithCard(hands: Hand[], card: Card): number {
   return hands.findIndex((hand) =>
