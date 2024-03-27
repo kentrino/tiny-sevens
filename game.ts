@@ -156,7 +156,7 @@ export function run(game: Game, action: Action): RunResult {
         }
       }),
       currentPlayer: initialPlayer,
-      turn: initialPlayer,
+      turn: 0,
     }
     return {
       game: newGame,
