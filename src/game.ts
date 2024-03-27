@@ -176,22 +176,20 @@ const skipRule: PartialRule<'skips'> = (game, action) => {
 
 const loserRule: PartialRule<'losers'> = (game, action) => {
   const newLoser = game.skips.findIndex((s) => s > 3)
-  const { field, hands } = placeLosersHand(game, newLoser)
-  let newLosers = game.losers
   if (newLoser !== -1 && !game.losers.includes(newLoser)) {
-    newLosers = [...game.losers, newLoser]
+    const newLosers = [...game.losers, newLoser]
+    return {
+      game: {
+        ...placeLosersHand(game, newLoser),
+        losers: newLosers,
+      },
+      effect: {
+        continue: true,
+        newLoser,
+      },
+    }
   }
-  return {
-    game: {
-      field,
-      hands,
-      losers: newLosers,
-    },
-    effect: {
-      continue: true,
-      newLoser,
-    },
-  }
+  return { game }
 }
 
 const initialActionRule: PartialRule<'currentPlayer' | 'hands' | 'field'> = (game, action) => {
@@ -267,7 +265,9 @@ const finishRule: PartialRule<'losers'> = (game, _) => {
       game,
       effect: {
         continue: false,
-        winner: game.hands.findIndex((hand) => hand.cards.length === 0),
+        winner: game.hands.findIndex(
+          (hand, player) => hand.cards.length === 0 && !game.losers.includes(player),
+        ),
       },
     }
   }
