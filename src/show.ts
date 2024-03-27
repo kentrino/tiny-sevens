@@ -25,7 +25,7 @@ function printField(field: Field) {
 }
 
 function fancy(card: Card) {
-  return `${s(card.suit)}${card.number}`
+  return `${s(card.suit)}${card.rank}`
 }
 
 function s(suit: Suit) {

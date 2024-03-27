@@ -4,7 +4,7 @@ import { random } from './random.ts'
 export function shuffle(numPlayers: number): Hand[] {
   const cards: Card[] = numbers.flatMap((number) =>
     suits.map((suit) => ({
-      number,
+      rank: number,
       suit,
     })),
   )

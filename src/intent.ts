@@ -59,7 +59,7 @@ function asCard(input: string): Result<Card> {
   return {
     ok: true,
     value: {
-      number: number as Rank,
+      rank: number as Rank,
       suit: suit as Suit,
     },
   }

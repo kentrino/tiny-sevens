@@ -87,7 +87,7 @@ describe('game', () => {
     const startGame = initGame()
     const actions: Action[] = [
       { type: 'initial' },
-      { type: 'card', card: { number: '8', suit: 'S' }, player: 0 },
+      { type: 'card', card: { rank: '8', suit: 'S' }, player: 0 },
     ]
     const { game, effect } = apply(actions, startGame)
     expect(format(game)).toEqual({
@@ -114,18 +114,18 @@ describe('game', () => {
     const startGame = initGame()
     const actions: Action[] = [
       { type: 'initial' },
-      { type: 'card', card: { number: '8', suit: 'S' }, player: 0 },
+      { type: 'card', card: { rank: '8', suit: 'S' }, player: 0 },
       { type: 'skip', player: 1 },
-      { type: 'card', card: { number: '6', suit: 'H' }, player: 2 },
-      { type: 'card', card: { number: '8', suit: 'H' }, player: 3 },
-      { type: 'card', card: { number: '5', suit: 'H' }, player: 0 },
+      { type: 'card', card: { rank: '6', suit: 'H' }, player: 2 },
+      { type: 'card', card: { rank: '8', suit: 'H' }, player: 3 },
+      { type: 'card', card: { rank: '5', suit: 'H' }, player: 0 },
       { type: 'skip', player: 1 },
-      { type: 'card', card: { number: '8', suit: 'C' }, player: 2 },
-      { type: 'card', card: { number: '6', suit: 'C' }, player: 3 },
-      { type: 'card', card: { number: '9', suit: 'S' }, player: 0 },
+      { type: 'card', card: { rank: '8', suit: 'C' }, player: 2 },
+      { type: 'card', card: { rank: '6', suit: 'C' }, player: 3 },
+      { type: 'card', card: { rank: '9', suit: 'S' }, player: 0 },
       { type: 'skip', player: 1 },
-      { type: 'card', card: { number: '9', suit: 'H' }, player: 2 },
-      { type: 'card', card: { number: '6', suit: 'D' }, player: 3 },
+      { type: 'card', card: { rank: '9', suit: 'H' }, player: 2 },
+      { type: 'card', card: { rank: '6', suit: 'D' }, player: 3 },
       { type: 'skip', player: 0 },
       { type: 'skip', player: 1 },
     ]
@@ -177,26 +177,26 @@ describe('game', () => {
     })
 
     const actions: Action[] = [
-      { type: 'card', card: { number: '9', suit: 'C' }, player: 2 },
-      { type: 'card', card: { number: '6', suit: 'S' }, player: 3 },
-      { type: 'card', card: { number: '0', suit: 'D' }, player: 0 },
-      { type: 'card', card: { number: 'J', suit: 'D' }, player: 2 },
-      { type: 'card', card: { number: '3', suit: 'H' }, player: 3 },
-      { type: 'card', card: { number: 'K', suit: 'H' }, player: 0 },
+      { type: 'card', card: { rank: '9', suit: 'C' }, player: 2 },
+      { type: 'card', card: { rank: '6', suit: 'S' }, player: 3 },
+      { type: 'card', card: { rank: '0', suit: 'D' }, player: 0 },
+      { type: 'card', card: { rank: 'J', suit: 'D' }, player: 2 },
+      { type: 'card', card: { rank: '3', suit: 'H' }, player: 3 },
+      { type: 'card', card: { rank: 'K', suit: 'H' }, player: 0 },
       { type: 'skip', player: 2 },
-      { type: 'card', card: { number: '4', suit: 'C' }, player: 3 },
-      { type: 'card', card: { number: 'J', suit: 'H' }, player: 0 },
-      { type: 'card', card: { number: '3', suit: 'C' }, player: 2 },
-      { type: 'card', card: { number: '2', suit: 'C' }, player: 3 },
-      { type: 'card', card: { number: '0', suit: 'C' }, player: 0 },
-      { type: 'card', card: { number: 'J', suit: 'C' }, player: 2 },
-      { type: 'card', card: { number: '4', suit: 'D' }, player: 3 },
-      { type: 'card', card: { number: 'Q', suit: 'S' }, player: 0 },
-      { type: 'card', card: { number: 'Q', suit: 'C' }, player: 2 },
-      { type: 'card', card: { number: '5', suit: 'S' }, player: 3 },
-      { type: 'card', card: { number: 'A', suit: 'C' }, player: 0 },
-      { type: 'card', card: { number: '3', suit: 'D' }, player: 2 },
-      { type: 'card', card: { number: '4', suit: 'S' }, player: 3 },
+      { type: 'card', card: { rank: '4', suit: 'C' }, player: 3 },
+      { type: 'card', card: { rank: 'J', suit: 'H' }, player: 0 },
+      { type: 'card', card: { rank: '3', suit: 'C' }, player: 2 },
+      { type: 'card', card: { rank: '2', suit: 'C' }, player: 3 },
+      { type: 'card', card: { rank: '0', suit: 'C' }, player: 0 },
+      { type: 'card', card: { rank: 'J', suit: 'C' }, player: 2 },
+      { type: 'card', card: { rank: '4', suit: 'D' }, player: 3 },
+      { type: 'card', card: { rank: 'Q', suit: 'S' }, player: 0 },
+      { type: 'card', card: { rank: 'Q', suit: 'C' }, player: 2 },
+      { type: 'card', card: { rank: '5', suit: 'S' }, player: 3 },
+      { type: 'card', card: { rank: 'A', suit: 'C' }, player: 0 },
+      { type: 'card', card: { rank: '3', suit: 'D' }, player: 2 },
+      { type: 'card', card: { rank: '4', suit: 'S' }, player: 3 },
     ]
     const { game, effect } = apply(actions, initialGame)
     expect(format(game)).toEqual({

@@ -15,10 +15,10 @@ export function format(game: Game) {
 
 function formatField(field: Field) {
   return mapValues(field.fields, (v) => {
-    return v.map((card) => card?.number ?? '.').join('')
+    return v.map((card) => card?.rank ?? '.').join('')
   })
 }
 
 function formatHand(hand: Hand) {
-  return hand.cards.map((card) => `${card.suit}${card.number}`).join(' ')
+  return hand.cards.map((card) => `${card.suit}${card.rank}`).join(' ')
 }

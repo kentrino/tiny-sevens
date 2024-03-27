@@ -19,7 +19,7 @@ function parseField(field: ReturnType<typeof format>['field']): Field {
         }
         return {
           suit: char,
-          number: suit,
+          rank: suit,
         }
       }) as never
     }),
@@ -36,7 +36,7 @@ function parseHand(hand: ReturnType<typeof format>['hands'][number]): Hand {
     cards: hand.split(' ').map((str) => {
       return {
         suit: str[0],
-        number: str[1],
+        rank: str[1],
       } as Card
     }),
   }

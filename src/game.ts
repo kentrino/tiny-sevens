@@ -11,12 +11,12 @@ export type Suit = 'S' | 'H' | 'D' | 'C'
 export const suits = ['S', 'H', 'D', 'C'] as const
 
 export type Card = {
-  number: Rank
+  rank: Rank
   suit: Suit
 }
 
 type _Card<N extends Rank, S extends Suit> = {
-  number: N
+  rank: N
   suit: S
 }
 
@@ -116,7 +116,7 @@ export function validate(game: Game, action: Action): Result<''> {
     const hand = game.hands[action.player]
     if (
       !hand.cards.some(
-        (card) => card.number === action.card.number && card.suit === action.card.suit,
+        (card) => card.rank === action.card.rank && card.suit === action.card.suit,
       )
     ) {
       return { ok: false, error: 'you do not have the card' }
@@ -201,7 +201,7 @@ const initialActionRule: PartialRule<'currentPlayer' | 'hands' | 'field'> = (gam
       return {
         game: {
           ...newGamePartialAfterInitialAction(game),
-          currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }),
+          currentPlayer: findPlayerWithCard(game.hands, { rank: '7', suit: 'D' }),
         },
       }
     }
@@ -306,7 +306,7 @@ function apply(
 
 function findPlayerWithCard(hands: Hand[], card: Card): number {
   return hands.findIndex((hand) =>
-    hand.cards.some((c) => c.number === card.number && c.suit === card.suit),
+    hand.cards.some((c) => c.rank === card.rank && c.suit === card.suit),
   )
 }
 
@@ -347,13 +347,13 @@ function placeLosersHand(
 function newGamePartialAfterInitialAction(game: Game): Pick<Game, 'hands' | 'field'> {
   let field = game.field
   for (const suit of suits) {
-    field = place(field, { number: '7', suit: suit })
+    field = place(field, { rank: '7', suit: suit })
   }
   return {
     field,
     hands: game.hands.map((hand) => {
       return {
-        cards: hand.cards.filter((card) => card.number !== '7'),
+        cards: hand.cards.filter((card) => card.rank !== '7'),
       }
     }),
   }
@@ -369,7 +369,7 @@ function newGamePartialAfterCardAction(
   action: CardAction,
 ): Pick<Game, 'hands' | 'field'> {
   function isSame(a: Card, b: Card): boolean {
-    return a.number === b.number && a.suit === b.suit
+    return a.rank === b.rank && a.suit === b.suit
   }
   return {
     field: place(game.field, action.card),
@@ -410,7 +410,7 @@ function initialField(): Field {
 }
 
 function canPlace(field: Field, card: Card): Result<''> {
-  const rightPlace = numbers.indexOf(card.number)
+  const rightPlace = numbers.indexOf(card.rank)
   const right = field.fields[card.suit][rightPlace + 1]
   const left = field.fields[card.suit][rightPlace - 1]
   if (right === undefined && left === undefined) {
@@ -421,7 +421,7 @@ function canPlace(field: Field, card: Card): Result<''> {
 
 function place(field: Field, card: Card): Field {
   const copied = copy(field)
-  const rightPlace = numbers.indexOf(card.number)
+  const rightPlace = numbers.indexOf(card.rank)
   const newRow = copied.fields[card.suit].map((c, i) => {
     if (i === rightPlace) {
       return card
