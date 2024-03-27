@@ -237,7 +237,7 @@ const loserRule: PartialRule<'losers'> = (game, action) => {
   }
 }
 
-const ruleNextPlayers: PartialRule<'currentPlayer'> = (game, action) => {
+const nextPlayerRule: PartialRule<'currentPlayer'> = (game, action) => {
   switch (action.type) {
     case 'skip': {
       return {
@@ -284,7 +284,7 @@ type PartialRule<T extends keyof Game> = (
 
 function apply(game: Game, action: Action): { game: Game; effect: Effect } {
   const rules: PartialRule<never>[] = [
-    ruleNextPlayers
+    nextPlayerRule,
   ]
   return rules.reduce(
     (acc, rule): { game: Game; effect: Effect } => {
