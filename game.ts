@@ -191,15 +191,13 @@ const handAndFieldRule: PartialRule<'hands' | "field"> = (game, action) => {
       }
     }
     case 'initial': {
-      const { hands, field } = newGamePartialAfterInitialAction(game)
       return {
-        game: { hands, field },
+        game:  newGamePartialAfterInitialAction(game)
       }
     }
     case 'card': {
-      const { hands, field } = newGamePartialAfterCardAction(game, action)
       return {
-        game: { hands, field },
+        game: newGamePartialAfterCardAction(game, action)
       }
     }
   }
