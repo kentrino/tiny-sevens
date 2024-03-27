@@ -1,11 +1,12 @@
 import { expect, test, describe, it } from 'bun:test'
 import { random } from './random.ts'
-import { initialGame, run } from './game.ts'
+import { type Action, initialGame, run } from './game.ts'
 import { format } from './helpers/format.ts'
+import { apply } from './helpers/apply.ts'
 
 describe('game', () => {
   function initializeRandomWithSeed() {
-    random("test seed")
+    random('test seed')
   }
 
   it('format', () => {
@@ -54,6 +55,35 @@ describe('game', () => {
       numPlayers: 4,
       skips: [0, 0, 0, 0],
       turn: 0,
+    })
+  })
+
+  it('after initial action and first move', () => {
+    initializeRandomWithSeed()
+    const startGame = initialGame(4)
+    const actions: Action[] = [
+      { type: 'initial' },
+      { type: 'card', card: { number: '8', suit: 'S' }, player: 0 },
+    ]
+    const { game, effect } = apply(actions, startGame)
+    expect(format(game)).toEqual({
+      currentPlayer: 1,
+      field: {
+        C: '......7.......',
+        D: '......7.......',
+        H: '......7.......',
+        S: '......78......',
+      },
+      hands: [
+        'KS 2S KC 0C 9S 0D JH AC KH 5H QS',
+        'AS KD 4H 8D 9D 0S JS 5C QH 0H AH 2H 5D',
+        '9H 9C JD AD QC JC 6H QD 3S 3C 2D 8C 3D',
+        '2C 4C 3H 4S 6S 4D 8H 6D 5S 6C',
+      ],
+      losers: [],
+      numPlayers: 4,
+      skips: [0, 0, 0, 0],
+      turn: 1,
     })
   })
 })

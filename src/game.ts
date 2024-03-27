@@ -69,7 +69,7 @@ export type Action =
       type: 'initial'
     }
 
-type Effect = {
+export type Effect = {
   continue: boolean
   newLoser?: number
   winner?: number
