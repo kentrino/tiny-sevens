@@ -205,6 +205,40 @@ const handAndFieldRule: PartialRule<'hands' | "field"> = (game, action) => {
   }
 }
 
+const skipRule: PartialRule<'skips'> = (game, action) => {
+  switch (action.type) {
+    case 'skip': {
+      const newSkips = game.skips.map((s, i) => (i === game.currentPlayer ? s + 1 : s))
+      return {
+        game: {skips: newSkips}
+      }
+    }
+    default: {
+      return { game }
+    }
+  }
+}
+
+const loserRule: PartialRule<'losers'> = (game, action) => {
+  const newLoser = game.skips.findIndex((s) => s > 3)
+  const { field, hands } = placeLosersHand(game, newLoser)
+  let newLosers = game.losers
+  if (newLoser !== -1 && !game.losers.includes(newLoser)) {
+    newLosers = [...game.losers, newLoser]
+  }
+  return {
+    game: {
+      field,
+      hands,
+      losers: newLosers,
+    },
+    effect: {
+      continue: true,
+      newLoser,
+    },
+  }
+}
+
 const ruleNextPlayers: PartialRule<'currentPlayer'> = (game, action) => {
   switch (action.type) {
     case 'skip': {
@@ -225,6 +259,21 @@ const ruleNextPlayers: PartialRule<'currentPlayer'> = (game, action) => {
   }
 }
 
+const nextTurnRule: PartialRule<'turn'> = (game, action) => {
+  switch (action.type) {
+    case 'initial': {
+      return {
+        game: { turn: 0 },
+      }
+    }
+    default: {
+      return {
+        game: { turn: game.turn + 1 },
+      }
+    }
+  }
+}
+
 type Effect = {
   continue: boolean
   newLoser?: number
@@ -236,7 +285,9 @@ type PartialRule<T extends keyof Game> = (
 ) => { game: Pick<Game, T>; effect?: Effect }
 
 function apply(game: Game, action: Action): { game: Game; effect: Effect } {
-  const rules: PartialRule<never>[] = [ruleNextPlayers]
+  const rules: PartialRule<never>[] = [
+    ruleNextPlayers
+  ]
   return rules.reduce(
     (acc, rule): { game: Game; effect: Effect } => {
       const { game, effect } = rule(acc.game, action)
