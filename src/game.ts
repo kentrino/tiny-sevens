@@ -81,6 +81,9 @@ type PartialRule<T extends keyof Game> = (
 ) => { game: Pick<Game, T>; effect?: Effect }
 
 export function initialGame(numPlayers: number): Game {
+  if (numPlayers > 10) {
+    throw new Error('too many players')
+  }
   return {
     field: initialField(),
     hands: shuffle(numPlayers),

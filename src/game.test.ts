@@ -4,7 +4,6 @@ import { type Action, initialGame, run } from './game.ts'
 import { format } from './helpers/format.ts'
 import { apply } from './helpers/apply.ts'
 import { parse } from './helpers/parse.ts'
-import { inspect } from 'bun'
 
 describe('game', () => {
   function initGame() {
