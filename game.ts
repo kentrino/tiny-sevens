@@ -199,6 +199,11 @@ function newGameAfterInitialAction(game: Game): Pick<Game, 'hands' | 'field'> {
   }
 }
 
+/**
+ * Place a card on the field and remove it from the hand.
+ * @param game
+ * @param action
+ */
 function newGameAfterCardAction(game: Game, action: CardAction): Pick<Game, 'hands' | 'field'> {
   function isSame(a: Card, b: Card): boolean {
     return a.number === b.number && a.suit === b.suit
