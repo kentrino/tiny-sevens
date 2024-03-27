@@ -183,7 +183,7 @@ export function run(game: Game, action: Action): RunResult {
   }
 }
 
-const handAndFieldRule: PartialRule<'hands' | "field"> = (game, action) => {
+const handAndFieldRule: PartialRule<'hands' | 'field'> = (game, action) => {
   switch (action.type) {
     case 'skip': {
       return {
@@ -192,12 +192,12 @@ const handAndFieldRule: PartialRule<'hands' | "field"> = (game, action) => {
     }
     case 'initial': {
       return {
-        game:  newGamePartialAfterInitialAction(game)
+        game: newGamePartialAfterInitialAction(game),
       }
     }
     case 'card': {
       return {
-        game: newGamePartialAfterCardAction(game, action)
+        game: newGamePartialAfterCardAction(game, action),
       }
     }
   }
@@ -208,7 +208,7 @@ const skipRule: PartialRule<'skips'> = (game, action) => {
     case 'skip': {
       const newSkips = game.skips.map((s, i) => (i === game.currentPlayer ? s + 1 : s))
       return {
-        game: {skips: newSkips}
+        game: { skips: newSkips },
       }
     }
     default: {
@@ -272,9 +272,39 @@ const nextTurnRule: PartialRule<'turn'> = (game, action) => {
   }
 }
 
+const finishRule: PartialRule<'losers'> = (game, _) => {
+  if (game.losers.length === game.numPlayers - 1) {
+    const winner = range(game.numPlayers).find((i) => !game.losers.includes(i))
+    if (typeof winner === 'undefined') {
+      throw new Error('Illegal state')
+    }
+    return {
+      game,
+      effect: {
+        continue: false,
+        winner,
+      },
+    }
+  }
+  const canFinish = game.hands.some(
+    (hand, player) => hand.cards.length === 0 && !game.losers.includes(player),
+  )
+  if (canFinish) {
+    return {
+      game,
+      effect: {
+        continue: false,
+        winner: game.hands.findIndex((hand) => hand.cards.length === 0),
+      },
+    }
+  }
+  return { game }
+}
+
 type Effect = {
   continue: boolean
   newLoser?: number
+  winner?: number
 }
 
 type PartialRule<T extends keyof Game> = (
@@ -284,7 +314,12 @@ type PartialRule<T extends keyof Game> = (
 
 function apply(game: Game, action: Action): { game: Game; effect: Effect } {
   const rules: PartialRule<never>[] = [
+    handAndFieldRule,
+    skipRule,
+    loserRule,
     nextPlayerRule,
+    nextTurnRule,
+    finishRule,
   ]
   return rules.reduce(
     (acc, rule): { game: Game; effect: Effect } => {
@@ -295,6 +330,7 @@ function apply(game: Game, action: Action): { game: Game; effect: Effect } {
         effect: {
           continue: acc.effect.continue && (effect?.continue ?? defaultContinue),
           newLoser: effect?.newLoser ?? acc.effect.newLoser,
+          winner: effect?.winner ?? acc.effect.winner,
         },
       }
     },
