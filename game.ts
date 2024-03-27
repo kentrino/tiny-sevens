@@ -50,6 +50,7 @@ export type Game = {
   numPlayers: number
   currentPlayer: number
   losers: number[]
+  skips: number[]
 }
 
 type FinishStatus = {
@@ -88,6 +89,7 @@ export function initialGame(numPlayers: number): Game {
     turn: 0,
     numPlayers,
     losers: [],
+    skips: range(numPlayers).map(() => 0),
   }
 }
 
