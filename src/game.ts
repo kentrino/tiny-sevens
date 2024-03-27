@@ -132,8 +132,8 @@ export function run(game: Game, action: Action): { game: Game; effect: Effect } 
   }
   return apply(
     [
-      initialPlayerRule,
-      handAndFieldRule,
+      initialActionRule,
+      cardActionRule,
       skipRule,
       loserRule,
       nextPlayerRule,
@@ -145,22 +145,15 @@ export function run(game: Game, action: Action): { game: Game; effect: Effect } 
   )
 }
 
-const handAndFieldRule: PartialRule<'hands' | 'field'> = (game, action) => {
+const cardActionRule: PartialRule<'hands' | 'field'> = (game, action) => {
   switch (action.type) {
-    case 'skip': {
-      return {
-        game: game,
-      }
-    }
-    case 'initial': {
-      return {
-        game: newGamePartialAfterInitialAction(game),
-      }
-    }
     case 'card': {
       return {
         game: newGamePartialAfterCardAction(game, action),
       }
+    }
+    default: {
+      return { game }
     }
   }
 }
@@ -199,11 +192,14 @@ const loserRule: PartialRule<'losers'> = (game, action) => {
   }
 }
 
-const initialPlayerRule: PartialRule<'currentPlayer'> = (game, action) => {
+const initialActionRule: PartialRule<'currentPlayer' | 'hands' | 'field'> = (game, action) => {
   switch (action.type) {
     case 'initial': {
       return {
-        game: { currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }) },
+        game: {
+          ...newGamePartialAfterInitialAction(game),
+          currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }),
+        },
       }
     }
     default: {
