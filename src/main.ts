@@ -4,7 +4,7 @@ import { ask } from './ask.ts'
 import { intent } from './intent.ts'
 import { random } from './random.ts'
 
-export async function main({seed, players}: {seed?: string, players: number}) {
+export async function main({ seed, players }: { seed?: string; players: number }) {
   if (typeof seed !== 'undefined') {
     random(seed)
   }
