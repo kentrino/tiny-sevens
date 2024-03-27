@@ -9,40 +9,59 @@ import {
   suits,
   validate
 } from "./game.ts"
+import type { Result } from "./result.ts"
 
-export function intent(game: Game, input: string): Action | undefined {
+export function intent(game: Game, input: string): Result<Action> {
   const player = currentPlayer(game)
-  const hand = game.hands[player]
   if (input === 'skip') {
-    return {
-      type: 'skip',
-      player: player
-    }
+    return { ok: true, value: { type: 'skip' as const, player } }
   }
   const card = asCard(input)
-  if (card === undefined) {
-    return undefined
+  if (!card.ok) {
+    return {
+      ok: false,
+      error: card.error
+    }
   }
-  const action = { type: 'card' as const, player, card }
-  if (validate(game, action)) {
-    return action
-  }
-  return undefined
-}
-
-function asCard(input: string): Card | undefined {
-  const [suit, number] = input.split('')
-  if (number === undefined || suit === undefined) {
-    return undefined
-  }
-  if (!numbers.includes(number as never)) {
-    return undefined
-  }
-  if (!suits.includes(suit as never)) {
-    return undefined
+  const action = { type: 'card' as const, player, card: card.value }
+  const res = validate(game, action)
+  if (!res.ok) {
+    return {
+      ok: false,
+      error: res.error
+    }
   }
   return {
-    number: number as never as Number,
-    suit: suit as never as Suit
+    ok: true,
+    value: action
+  }
+}
+
+function asCard(input: string): Result<Card> {
+  if (input.length !== 2) {
+    return {
+      ok: false,
+      error: 'Invalid length'
+    }
+  }
+  const [suit, number] = input.split('')
+  if (!numbers.includes(number as never)) {
+    return {
+      ok: false,
+      error: 'Invalid number'
+    }
+  }
+  if (!suits.includes(suit as never)) {
+    return {
+      ok: false,
+      error: 'Invalid suit'
+    }
+  }
+  return {
+    ok: true,
+    value: {
+      number: number as Number,
+      suit: suit as Suit
+    }
   }
 }

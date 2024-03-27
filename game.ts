@@ -1,5 +1,6 @@
 import { shuffle } from "./shuffle.ts"
 import { copy } from "./copy.ts"
+import type { Result } from "./result.ts"
 
 export type Number = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | 'J' | 'Q' | 'K'
 export const numbers = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'J', 'Q', 'K'] as const
@@ -73,19 +74,33 @@ export type Action = {
   card: Card
 }
 
-function canPlace(field: Field, card: Card): boolean {
-  const rightPlace = numbers.indexOf(card.number) + 1
+function canPlace(field: Field, card: Card): Result<''> {
+  const rightPlace = numbers.indexOf(card.number)
   if (rightPlace < 7) {
     const right = rightPlace + 1
-    return typeof field.fields[card.suit][right] !== 'undefined'
+    const ok = typeof field.fields[card.suit][right] !== 'undefined'
+    if (ok) {
+      return { ok: true, value: '' }
+    }
+    return {
+      ok: false,
+      error: 'right-hand neighbor is empty'
+    }
   }
   const left = rightPlace - 1
-  return typeof field.fields[card.suit][left] !== 'undefined'
+  const ok = typeof field.fields[card.suit][left] !== 'undefined'
+  if (ok) {
+    return { ok: true, value: '' }
+  }
+  return {
+    ok: false,
+    error: 'left-hand neighbor is empty'
+  }
 }
 
 function place(field: Field, card: Card): Field {
   const copied = copy(field)
-  const rightPlace = numbers.indexOf(card.number) + 1
+  const rightPlace = numbers.indexOf(card.number)
   const newRow = copied.fields[card.suit].map((c, i) => {
     if (i === rightPlace) {
       return card
@@ -104,27 +119,28 @@ export function currentPlayer(game: Game) {
   return game.turn % game.numPlayers
 }
 
-export function validate(game: Game, action: Action): boolean {
+export function validate(game: Game, action: Action): Result<''> {
   // check player
   if (currentPlayer(game) !== action.player) {
-    return false
+    return {ok: false, error: 'not your turn'}
   }
   // check card
   if (action.type === 'card') {
     // check hand
     const hand = game.hands[action.player]
     if (!hand.cards.some((card) => card.number === action.card.number && card.suit === action.card.suit)) {
-      return false
+      return { ok: false, error: 'you do not have the card' }
     }
     // check field
-    if (!canPlace(game.field, action.card)) {
-      return false
+    const res = canPlace(game.field, action.card)
+    if (!res.ok) {
+      return { ok: false, error: res.error }
     }
   }
-  return true
+  return { ok: true, value: '' }
 }
 
-function action(game: Game, action: Action): Game {
+export function run(game: Game, action: Action): Game {
   function isSame(a: Card, b: Card): boolean {
     return a.number === b.number && a.suit === b.suit
   }

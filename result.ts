@@ -1,7 +1,7 @@
 export type Result<T> = {
-  success: true
-  data: T
+  ok: true
+  value: T
 } | {
-  success: false
+  ok: false
   error?: string
 }
