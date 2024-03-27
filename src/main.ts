@@ -4,8 +4,10 @@ import { ask } from './ask.ts'
 import { intent } from './intent.ts'
 import { random } from './random.ts'
 
-export async function main() {
-  random('test seed')
+export async function main(seed?: string) {
+  if (typeof seed !== 'undefined') {
+    random(/* 'test seed' */ seed)
+  }
   let game: Game = initialGame(4)
   const { game: _game } = run(game, { type: 'initial' })
   game = _game
