@@ -52,6 +52,18 @@ export type Game = {
   losers: number[]
 }
 
+type FinishStatus = {
+  status: true
+  winner: number
+} | {
+  status: false
+}
+
+type RunResult = {
+  game: Game
+  finish: FinishStatus
+}
+
 export type Action =
   | {
       player: number
@@ -108,7 +120,7 @@ export function validate(game: Game, action: Action): Result<''> {
   return { ok: true, value: '' }
 }
 
-export function run(game: Game, action: Action): Game {
+export function run(game: Game, action: Action): RunResult {
   function isSame(a: Card, b: Card): boolean {
     return a.number === b.number && a.suit === b.suit
   }
@@ -118,9 +130,12 @@ export function run(game: Game, action: Action): Game {
   if (action.type === 'skip') {
     const next = nextPlayer(game)
     return {
-      ...game,
-      turn: game.turn + 1,
-      currentPlayer: next,
+      finish: { status: false },
+      game: {
+        ...game,
+        turn: game.turn + 1,
+        currentPlayer: next,
+      }
     }
   }
   if (action.type === 'initial') {
@@ -132,31 +147,37 @@ export function run(game: Game, action: Action): Game {
       field = place(field, { number: '7', suit: suit })
     }
     return {
-      ...game,
-      field: field,
-      hands: game.hands.map((hand) => {
-        return {
-          cards: hand.cards.filter((card) => card.number !== '7'),
-        }
-      }),
-      currentPlayer: initialPlayer,
-      turn: initialPlayer,
+      game: {
+        ...game,
+        field: field,
+        hands: game.hands.map((hand) => {
+          return {
+            cards: hand.cards.filter((card) => card.number !== '7'),
+          }
+        }),
+        currentPlayer: initialPlayer,
+        turn: initialPlayer,
+      },
+      finish: { status: false },
     }
   }
   const next = nextPlayer(game)
   return {
-    ...game,
-    field: place(game.field, action.card),
-    hands: game.hands.map((hand, player) => {
-      if (player === action.player) {
-        return {
-          cards: hand.cards.filter((card) => !isSame(card, action.card)),
+    game: {
+      ...game,
+      field: place(game.field, action.card),
+      hands: game.hands.map((hand, player) => {
+        if (player === action.player) {
+          return {
+            cards: hand.cards.filter((card) => !isSame(card, action.card)),
+          }
         }
-      }
-      return hand
-    }),
-    turn: game.turn + 1,
-    currentPlayer: next,
+        return hand
+      }),
+      turn: game.turn + 1,
+      currentPlayer: next,
+    },
+    finish: { status: false},
   }
 }
 

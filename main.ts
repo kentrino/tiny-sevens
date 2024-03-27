@@ -5,7 +5,8 @@ import { intent } from './intent.ts'
 
 export async function main() {
   let game: Game = initialGame(4)
-  game = run(game, { type: 'initial' })
+  const { game: _game } = run(game, { type: 'initial' })
+  game = _game
   while (true) {
     console.log('-- -- -- -- -- -- -- -- -- -- -- -- --')
     show(game)
@@ -15,11 +16,12 @@ export async function main() {
       console.log(`Invalid move: ${mayBeAction.error}`)
       continue
     }
-    game = run(game, mayBeAction.value)
-    const res = canFinish(game)
-    if (res.ok) {
-      console.log('Game finished! Winner is player:', res.value.winner)
+    const runResult = run(game, mayBeAction.value)
+    if (runResult.finish.status) {
+      console.log('Game finished! Winner is player:', runResult.finish.winner)
       break
+    } else {
+      game = runResult.game
     }
   }
 }
