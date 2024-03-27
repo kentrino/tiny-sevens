@@ -44,7 +44,8 @@ function asCard(input: string): Result<Card> {
       error: 'Invalid length'
     }
   }
-  const [suit, number] = input.split('')
+  const [_suit, number] = input.split('')
+  const suit = _suit.toUpperCase()
   if (!numbers.includes(number as never)) {
     return {
       ok: false,

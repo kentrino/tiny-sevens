@@ -3,11 +3,10 @@ import { type Card, currentPlayer, type Field, type Game, numbers, type Suit, su
 export function show(game: Game) {
   const player = currentPlayer(game)
   const hand = game.hands[player]
-  console.log(`Player: ${player}`)
+  const playerDisplay = `Player ${player}'s`
   printField(game.field)
-  console.log('Hand:')
-  const h = hand.cards.map((card) => fancy(card)).join(' ')
-  console.log(h)
+  const handDisplay = hand.cards.map((card) => fancy(card)).join(' ')
+  console.log(`${playerDisplay} hand:\n ${handDisplay}`)
 }
 
 function printField(field: Field) {
