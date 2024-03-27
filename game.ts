@@ -146,7 +146,7 @@ export function run(game: Game, action: Action): RunResult {
     }
   }
   if (action.type === 'initial') {
-    const { hands, field } = newGameAfterInitialAction(game)
+    const { hands, field } = newGamePartialAfterInitialAction(game)
     const newGame = {
       ...game,
       field: field,
@@ -159,7 +159,7 @@ export function run(game: Game, action: Action): RunResult {
       finish: finishStatus(newGame),
     }
   }
-  const { hands, field } = newGameAfterCardAction(game, action)
+  const { hands, field } = newGamePartialAfterCardAction(game, action)
   const newGame = {
     ...game,
     field: field,
@@ -183,7 +183,7 @@ function findPlayerWithCard(hands: Hand[], card: Card): number {
  * Place all 7s on the field and remove them from the hands.
  * @param game
  */
-function newGameAfterInitialAction(game: Game): Pick<Game, 'hands' | 'field'> {
+function newGamePartialAfterInitialAction(game: Game): Pick<Game, 'hands' | 'field'> {
   let field = game.field
   for (const suit of suits) {
     field = place(field, { number: '7', suit: suit })
@@ -203,7 +203,7 @@ function newGameAfterInitialAction(game: Game): Pick<Game, 'hands' | 'field'> {
  * @param game
  * @param action
  */
-function newGameAfterCardAction(game: Game, action: CardAction): Pick<Game, 'hands' | 'field'> {
+function newGamePartialAfterCardAction(game: Game, action: CardAction): Pick<Game, 'hands' | 'field'> {
   function isSame(a: Card, b: Card): boolean {
     return a.number === b.number && a.suit === b.suit
   }
