@@ -7,9 +7,8 @@ export function shuffle(numPlayers: number): Hand[] {
       suit,
     })),
   )
-  const leftCards = cards.filter((card) => card.number !== '7')
-  const shuffled = leftCards.sort(() => Math.random() - 0.5)
-  const hands = chunk(shuffled, Math.floor(leftCards.length / numPlayers))
+  const shuffled = cards.sort(() => Math.random() - 0.5)
+  const hands = chunk(shuffled, Math.floor(cards.length / numPlayers))
   return hands.map((cards) => ({ cards }))
 }
 

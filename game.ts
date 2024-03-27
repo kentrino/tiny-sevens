@@ -59,6 +59,9 @@ export type Action =
       type: 'card'
       card: Card
     }
+  | {
+      type: 'initial'
+    }
 
 export function initialGame(numPlayers: number): Game {
   return {
@@ -74,6 +77,12 @@ export function currentPlayer(game: Game) {
 }
 
 export function validate(game: Game, action: Action): Result<''> {
+  if (action.type === 'initial') {
+    if (game.turn !== 0) {
+      return { ok: false, error: 'game has already started' }
+    }
+    return { ok: true, value: '' }
+  }
   // check player
   if (currentPlayer(game) !== action.player) {
     return { ok: false, error: 'not your turn' }
@@ -111,6 +120,25 @@ export function run(game: Game, action: Action): Game {
       turn: game.turn + 1,
     }
   }
+  if (action.type === 'initial') {
+    const initialPlayer = game.hands.findIndex((hand) =>
+      hand.cards.some((card) => card.number === '7' && card.suit === 'D'),
+    )
+    let field = game.field
+    for (const suit of suits) {
+      field = place(field, { number: '7', suit: suit })
+    }
+    return {
+      ...game,
+      field: field,
+      hands: game.hands.map((hand) => {
+        return {
+          cards: hand.cards.filter((card) => card.number !== '7'),
+        }
+      }),
+      turn: initialPlayer,
+    }
+  }
   return {
     ...game,
     field: place(game.field, action.card),
@@ -143,10 +171,10 @@ function initialField(): Field {
   const u = undefined
   return {
     fields: {
-      S: [u, u, u, u, u, u, { number: '7', suit: 'S' }, u, u, u, u, u, u, u],
-      H: [u, u, u, u, u, u, { number: '7', suit: 'H' }, u, u, u, u, u, u, u],
-      D: [u, u, u, u, u, u, { number: '7', suit: 'D' }, u, u, u, u, u, u, u],
-      C: [u, u, u, u, u, u, { number: '7', suit: 'C' }, u, u, u, u, u, u, u],
+      S: [u, u, u, u, u, u, u, u, u, u, u, u, u, u],
+      H: [u, u, u, u, u, u, u, u, u, u, u, u, u, u],
+      D: [u, u, u, u, u, u, u, u, u, u, u, u, u, u],
+      C: [u, u, u, u, u, u, u, u, u, u, u, u, u, u],
     },
   }
 }

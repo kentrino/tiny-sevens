@@ -5,6 +5,7 @@ import { intent } from './intent.ts'
 
 export async function main() {
   let game: Game = initialGame(4)
+  game = run(game, { type: 'initial' })
   while (true) {
     console.log('-- -- -- -- -- -- -- -- -- -- -- -- --')
     show(game)
