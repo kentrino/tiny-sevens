@@ -195,9 +195,12 @@ function findPlayerWithCard(hands: Hand[], card: Card): number {
  * @param field
  * @param loser
  */
-function placeLosersHand({hands, field}: Pick<Game, "hands" | "field">, loser: number): Pick<Game, "hands" | "field"> {
+function placeLosersHand(
+  { hands, field }: Pick<Game, 'hands' | 'field'>,
+  loser: number,
+): Pick<Game, 'hands' | 'field'> {
   if (loser < 0) {
-    return {hands, field}
+    return { hands, field }
   }
   if (loser >= hands.length) {
     throw new Error('Invalid loser index')
@@ -206,7 +209,7 @@ function placeLosersHand({hands, field}: Pick<Game, "hands" | "field">, loser: n
   const newField = loserHand.cards.reduce((f, card) => place(f, card), field)
   const newHands = hands.map((hand, i) => {
     if (i === loser) {
-      return {cards: []}
+      return { cards: [] }
     }
     return hand
   })
@@ -240,7 +243,10 @@ function newGamePartialAfterInitialAction(game: Game): Pick<Game, 'hands' | 'fie
  * @param game
  * @param action
  */
-function newGamePartialAfterCardAction(game: Game, action: CardAction): Pick<Game, 'hands' | 'field'> {
+function newGamePartialAfterCardAction(
+  game: Game,
+  action: CardAction,
+): Pick<Game, 'hands' | 'field'> {
   function isSame(a: Card, b: Card): boolean {
     return a.number === b.number && a.suit === b.suit
   }
@@ -265,7 +271,9 @@ export function finishStatus(game: Game): FinishStatus {
     }
     return { status: true, winner }
   }
-  const canFinish = game.hands.some((hand, player) => hand.cards.length === 0 && !game.losers.includes(player))
+  const canFinish = game.hands.some(
+    (hand, player) => hand.cards.length === 0 && !game.losers.includes(player),
+  )
   if (canFinish) {
     return {
       status: true,
