@@ -129,10 +129,14 @@ export function run(game: Game, action: Action): RunResult {
     throw new Error('invalid action')
   }
   if (action.type === 'skip') {
+    const newSkips = game.skips.map((s, i) => (i === game.currentPlayer ? s + 1 : s))
+    const newLoser = newSkips.findIndex((s) => s === 3)
     const newGame = {
       ...game,
+      skips: newSkips,
       turn: game.turn + 1,
       currentPlayer: nextPlayer(game),
+      loser: typeof newLoser === 'undefined' ? game.losers : [...game.losers, newLoser],
     }
     return {
       game: newGame,
