@@ -1,6 +1,7 @@
 import { shuffle } from './shuffle.ts'
 import { copy } from './copy.ts'
 import type { Result } from './result.ts'
+import { range } from './range.ts'
 
 export type Rank = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | 'J' | 'Q' | 'K'
 export const numbers = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'J', 'Q', 'K'] as const
@@ -76,7 +77,6 @@ export function initialGame(numPlayers: number): Game {
   }
 }
 
-
 export function validate(game: Game, action: Action): Result<''> {
   if (action.type === 'initial') {
     if (game.turn !== 0) {
@@ -117,14 +117,10 @@ export function run(game: Game, action: Action): Game {
   }
   if (action.type === 'skip') {
     const next = nextPlayer(game)
-    if (!next.ok) {
-      // TODO: rewrite this into Result
-      throw new Error('game is finished')
-    }
     return {
       ...game,
       turn: game.turn + 1,
-      currentPlayer: next.value,
+      currentPlayer: next,
     }
   }
   if (action.type === 'initial') {
@@ -148,10 +144,6 @@ export function run(game: Game, action: Action): Game {
     }
   }
   const next = nextPlayer(game)
-  if (!next.ok) {
-    // TODO: rewrite this into Result
-    throw new Error('game is finished')
-  }
   return {
     ...game,
     field: place(game.field, action.card),
@@ -164,11 +156,18 @@ export function run(game: Game, action: Action): Game {
       return hand
     }),
     turn: game.turn + 1,
-    currentPlayer: next.value,
+    currentPlayer: next,
   }
 }
 
 export function canFinish(game: Game): Result<{ winner: number }> {
+  if (game.losers.length === game.numPlayers - 1) {
+    const winner = range(game.numPlayers).find((i) => !game.losers.includes(i))
+    if (typeof winner === 'undefined') {
+      throw new Error('Illegal state')
+    }
+    return { ok: true, value: { winner } }
+  }
   const canFinish = game.hands.some((hand) => hand.cards.length === 0)
   if (canFinish) {
     return {
@@ -181,21 +180,15 @@ export function canFinish(game: Game): Result<{ winner: number }> {
   return { ok: false, error: 'game is not finished' }
 }
 
-function nextPlayer(game: Game): Result<number> {
+function nextPlayer(game: Game): number {
   let current = game.currentPlayer
   if (game.losers.length === game.numPlayers - 1) {
-    return {
-      ok: false,
-      error: 'game is finished',
-    }
+    throw new Error('Illegal state; game should have been finished')
   }
   while (true) {
     current = (current + 1) % game.numPlayers
     if (!game.losers.includes(current)) {
-      return {
-        ok: true,
-        value: current,
-      }
+      return current
     }
   }
 }

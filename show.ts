@@ -1,11 +1,4 @@
-import {
-  type Card,
-  type Field,
-  type Game,
-  numbers,
-  type Suit,
-  suits,
-} from './game.ts'
+import { type Card, type Field, type Game, numbers, type Suit, suits } from './game.ts'
 
 export function show(game: Game) {
   const player = game.currentPlayer
