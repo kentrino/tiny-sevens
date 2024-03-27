@@ -7,9 +7,9 @@ import {
   numbers,
   type Suit,
   suits,
-  validate
-} from "./game.ts"
-import type { Result } from "./result.ts"
+  validate,
+} from './game.ts'
+import type { Result } from './result.ts'
 
 export function intent(game: Game, input: string): Result<Action> {
   const player = currentPlayer(game)
@@ -20,7 +20,7 @@ export function intent(game: Game, input: string): Result<Action> {
   if (!card.ok) {
     return {
       ok: false,
-      error: card.error
+      error: card.error,
     }
   }
   const action = { type: 'card' as const, player, card: card.value }
@@ -28,12 +28,12 @@ export function intent(game: Game, input: string): Result<Action> {
   if (!res.ok) {
     return {
       ok: false,
-      error: res.error
+      error: res.error,
     }
   }
   return {
     ok: true,
-    value: action
+    value: action,
   }
 }
 
@@ -41,7 +41,7 @@ function asCard(input: string): Result<Card> {
   if (input.length !== 2) {
     return {
       ok: false,
-      error: 'Invalid length'
+      error: 'Invalid length',
     }
   }
   const [_suit, number] = input.split('')
@@ -49,20 +49,20 @@ function asCard(input: string): Result<Card> {
   if (!numbers.includes(number as never)) {
     return {
       ok: false,
-      error: 'Invalid number'
+      error: 'Invalid number',
     }
   }
   if (!suits.includes(suit as never)) {
     return {
       ok: false,
-      error: 'Invalid suit'
+      error: 'Invalid suit',
     }
   }
   return {
     ok: true,
     value: {
       number: number as Rank,
-      suit: suit as Suit
-    }
+      suit: suit as Suit,
+    },
   }
 }

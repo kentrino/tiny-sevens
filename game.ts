@@ -1,6 +1,6 @@
-import { shuffle } from "./shuffle.ts"
-import { copy } from "./copy.ts"
-import type { Result } from "./result.ts"
+import { shuffle } from './shuffle.ts'
+import { copy } from './copy.ts'
+import type { Result } from './result.ts'
 
 export type Rank = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | 'J' | 'Q' | 'K'
 export const numbers = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'J', 'Q', 'K'] as const
@@ -48,21 +48,23 @@ export type Game = {
   numPlayers: number
 }
 
-export type Action = {
-  player: number
-  type: 'skip'
-} | {
-  player: number
-  type: 'card',
-  card: Card
-}
+export type Action =
+  | {
+      player: number
+      type: 'skip'
+    }
+  | {
+      player: number
+      type: 'card'
+      card: Card
+    }
 
 export function initialGame(numPlayers: number): Game {
   return {
     field: initialField(),
     hands: shuffle(numPlayers),
     turn: 0,
-    numPlayers
+    numPlayers,
   }
 }
 
@@ -73,13 +75,17 @@ export function currentPlayer(game: Game) {
 export function validate(game: Game, action: Action): Result<''> {
   // check player
   if (currentPlayer(game) !== action.player) {
-    return {ok: false, error: 'not your turn'}
+    return { ok: false, error: 'not your turn' }
   }
   // check card
   if (action.type === 'card') {
     // check hand
     const hand = game.hands[action.player]
-    if (!hand.cards.some((card) => card.number === action.card.number && card.suit === action.card.suit)) {
+    if (
+      !hand.cards.some(
+        (card) => card.number === action.card.number && card.suit === action.card.suit,
+      )
+    ) {
       return { ok: false, error: 'you do not have the card' }
     }
     // check field
@@ -101,7 +107,7 @@ export function run(game: Game, action: Action): Game {
   if (action.type === 'skip') {
     return {
       ...game,
-      turn: game.turn + 1
+      turn: game.turn + 1,
     }
   }
   return {
@@ -110,19 +116,24 @@ export function run(game: Game, action: Action): Game {
     hands: game.hands.map((hand, player) => {
       if (player === action.player) {
         return {
-          cards: hand.cards.filter((card) => !isSame(card, action.card))
+          cards: hand.cards.filter((card) => !isSame(card, action.card)),
         }
       }
       return hand
     }),
-    turn: game.turn + 1
+    turn: game.turn + 1,
   }
 }
 
 export function canFinish(game: Game): Result<{ winner: number }> {
   const canFinish = game.hands.some((hand) => hand.cards.length === 0)
   if (canFinish) {
-    return { ok: true, value: { winner: game.hands.findIndex((hand) => hand.cards.length === 0) } }
+    return {
+      ok: true,
+      value: {
+        winner: game.hands.findIndex((hand) => hand.cards.length === 0),
+      },
+    }
   }
   return { ok: false, error: 'game is not finished' }
 }
@@ -131,11 +142,11 @@ function initialField(): Field {
   const u = undefined
   return {
     fields: {
-      S: [u, u, u, u, u, u, {number: '7', suit: 'S'}, u, u, u, u, u, u, u],
-      H: [u, u, u, u, u, u, {number: '7', suit: 'H'}, u, u, u, u, u, u, u],
-      D: [u, u, u, u, u, u, {number: '7', suit: 'D'}, u, u, u, u, u, u, u],
-      C: [u, u, u, u, u, u, {number: '7', suit: 'C'}, u, u, u, u, u, u, u],
-    }
+      S: [u, u, u, u, u, u, { number: '7', suit: 'S' }, u, u, u, u, u, u, u],
+      H: [u, u, u, u, u, u, { number: '7', suit: 'H' }, u, u, u, u, u, u, u],
+      D: [u, u, u, u, u, u, { number: '7', suit: 'D' }, u, u, u, u, u, u, u],
+      C: [u, u, u, u, u, u, { number: '7', suit: 'C' }, u, u, u, u, u, u, u],
+    },
   }
 }
 
@@ -149,7 +160,7 @@ function canPlace(field: Field, card: Card): Result<''> {
     }
     return {
       ok: false,
-      error: 'right-hand neighbor is empty'
+      error: 'right-hand neighbor is empty',
     }
   }
   const left = rightPlace - 1
@@ -159,7 +170,7 @@ function canPlace(field: Field, card: Card): Result<''> {
   }
   return {
     ok: false,
-    error: 'left-hand neighbor is empty'
+    error: 'left-hand neighbor is empty',
   }
 }
 
@@ -175,7 +186,7 @@ function place(field: Field, card: Card): Field {
   return {
     fields: {
       ...copied.fields,
-      [card.suit]: newRow
-    }
+      [card.suit]: newRow,
+    },
   }
 }
