@@ -127,11 +127,10 @@ export function run(game: Game, action: Action): RunResult {
     throw new Error('invalid action')
   }
   if (action.type === 'skip') {
-    const next = nextPlayer(game)
     const newGame = {
       ...game,
       turn: game.turn + 1,
-      currentPlayer: next,
+      currentPlayer: nextPlayer(game),
     }
     return {
       game: newGame,
