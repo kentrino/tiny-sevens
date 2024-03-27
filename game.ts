@@ -64,16 +64,18 @@ type RunResult = {
   finish: FinishStatus
 }
 
+type CardAction = {
+  player: number
+  type: 'card'
+  card: Card
+}
+
 export type Action =
   | {
       player: number
       type: 'skip'
     }
-  | {
-      player: number
-      type: 'card'
-      card: Card
-    }
+  | CardAction
   | {
       type: 'initial'
     }
@@ -121,9 +123,6 @@ export function validate(game: Game, action: Action): Result<''> {
 }
 
 export function run(game: Game, action: Action): RunResult {
-  function isSame(a: Card, b: Card): boolean {
-    return a.number === b.number && a.suit === b.suit
-  }
   if (!validate(game, action)) {
     throw new Error('invalid action')
   }
@@ -167,14 +166,7 @@ export function run(game: Game, action: Action): RunResult {
   const newGame = {
     ...game,
     field: place(game.field, action.card),
-    hands: game.hands.map((hand, player) => {
-      if (player === action.player) {
-        return {
-          cards: hand.cards.filter((card) => !isSame(card, action.card)),
-        }
-      }
-      return hand
-    }),
+    hands: newHandsAfterCardAction(game.hands, action),
     turn: game.turn + 1,
     currentPlayer: next,
   }
@@ -182,6 +174,20 @@ export function run(game: Game, action: Action): RunResult {
     game: newGame,
     finish: finishStatus(newGame)
   }
+}
+
+function newHandsAfterCardAction(hands: Hand[], action: CardAction): Hand[] {
+  function isSame(a: Card, b: Card): boolean {
+    return a.number === b.number && a.suit === b.suit
+  }
+  return hands.map((hand, player) => {
+    if (player === action.player) {
+      return {
+        cards: hand.cards.filter((card) => !isSame(card, action.card)),
+      }
+    }
+    return hand
+  })
 }
 
 export function finishStatus(game: Game): FinishStatus {
