@@ -1,1 +1,3 @@
-console.log("Hello via Bun!");
+import { main } from "./main.ts"
+
+main().catch(console.error)
