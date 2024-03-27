@@ -139,15 +139,12 @@ export function run(game: Game, action: Action): RunResult {
     }
   }
   if (action.type === 'initial') {
-    const initialPlayer = game.hands.findIndex((hand) =>
-      hand.cards.some((card) => card.number === '7' && card.suit === 'D'),
-    )
     const { hands, field } = newGameAfterInitialAction(game)
     const newGame = {
       ...game,
       field: field,
       hands: hands,
-      currentPlayer: initialPlayer,
+      currentPlayer: findPlayerWithCard(game.hands, { number: '7', suit: 'D' }),
       turn: 0,
     }
     return {
@@ -167,6 +164,12 @@ export function run(game: Game, action: Action): RunResult {
     game: newGame,
     finish: finishStatus(newGame)
   }
+}
+
+function findPlayerWithCard(hands: Hand[], card: Card): number {
+  return hands.findIndex((hand) =>
+    hand.cards.some((c) => c.number === card.number && c.suit === card.suit),
+  )
 }
 
 /**
