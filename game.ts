@@ -262,7 +262,7 @@ export function finishStatus(game: Game): FinishStatus {
     }
     return { status: true, winner }
   }
-  const canFinish = game.hands.some((hand) => hand.cards.length === 0)
+  const canFinish = game.hands.some((hand, player) => hand.cards.length === 0 && !game.losers.includes(player))
   if (canFinish) {
     return {
       status: true,
