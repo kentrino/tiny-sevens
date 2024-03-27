@@ -29,6 +29,7 @@ type C<N extends Rank> = _Cell<N, 'C'>
  * This precise type definition is not essential for the implementation; it merely delineates the rules of the game.
  */
 export type Field = {
+  // biome-ignore format:
   fields: {
     S: [S<'A'>, S<'2'>, S<'3'>, S<'4'>, S<'5'>, S<'6'>, S<'7'>, S<'8'>, S<'9'>, S<'0'>, S<'J'>, S<'J'>, S<'Q'>, S<'K'>],
     H: [H<'A'>, H<'2'>, H<'3'>, H<'4'>, H<'5'>, H<'6'>, H<'7'>, H<'8'>, H<'9'>, H<'0'>, H<'J'>, H<'J'>, H<'Q'>, H<'K'>],
